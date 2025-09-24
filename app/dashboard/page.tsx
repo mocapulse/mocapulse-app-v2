@@ -22,18 +22,29 @@ import {
   User,
 } from "lucide-react"
 import Link from "next/link"
-import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 
-interface Poll {
+interface TestingProject {
   id: string
   title: string
   description: string
-  status: "active" | "closed" | "draft"
-  responses: number
-  totalVotes: number
+  status: "active" | "closed" | "draft" | "completed"
+  applicationsReceived: number
+  testersNeeded: number
   endDate: string
   createdBy: string
   category: string
+  paymentRange: { min: number; max: number }
+  difficulty: string
+}
+
+interface TestingApplication {
+  id: string
+  projectId: string
+  projectTitle: string
+  status: "pending" | "accepted" | "rejected" | "completed"
+  appliedDate: string
+  category: string
+  paymentRange: { min: number; max: number }
 }
 
 interface UserProfile {
@@ -45,75 +56,109 @@ interface UserProfile {
 
 export default function DashboardPage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
-  const [userPolls, setUserPolls] = useState<Poll[]>([])
-  const [availablePolls, setAvailablePolls] = useState<Poll[]>([])
+  const [userProjects, setUserProjects] = useState<TestingProject[]>([])
+  const [myApplications, setMyApplications] = useState<TestingApplication[]>([])
   const [activeTab, setActiveTab] = useState("overview")
 
-  const headerReveal = useScrollReveal()
-  const statsReveal = useScrollReveal()
-  const contentReveal = useScrollReveal()
 
   useEffect(() => {
+    // Ensure this only runs on client side
+    if (typeof window === 'undefined') return;
+
     // Load user profile
     const savedProfile = localStorage.getItem("mocaEdgeProfile")
     if (savedProfile) {
-      const profile = JSON.parse(savedProfile)
-      setUserProfile({
-        id: profile.id,
-        username: profile.username,
-        reputation: profile.reputation,
-        role: "both", // Default to both for demo
-      })
+      try {
+        const profile = JSON.parse(savedProfile)
+        setUserProfile({
+          id: profile.id,
+          username: profile.username,
+          reputation: profile.reputation,
+          role: "both", // Default to both for demo
+        })
+      } catch (error) {
+        console.error('Failed to parse saved profile:', error)
+        // Create demo profile on error
+        const demoProfile = {
+          id: "demo_user",
+          username: "Demo User",
+          reputation: 165,
+          role: "both" as const
+        }
+        setUserProfile(demoProfile)
+        localStorage.setItem("mocaEdgeProfile", JSON.stringify(demoProfile))
+      }
+    } else {
+      // Create a demo profile if none exists
+      const demoProfile = {
+        id: "demo_user",
+        username: "Demo User",
+        reputation: 165,
+        role: "both" as const
+      }
+      setUserProfile(demoProfile)
+      // Optionally save demo profile to localStorage
+      localStorage.setItem("mocaEdgeProfile", JSON.stringify(demoProfile))
     }
 
-    // Mock data for polls
-    setUserPolls([
+    // Mock data for user's testing projects (for enterprises)
+    setUserProjects([
       {
-        id: "poll_1",
-        title: "Best Web3 Development Framework",
-        description: "Help us understand developer preferences for Web3 frameworks",
+        id: "project_1",
+        title: "Revolutionary NFT Marketplace Beta Testing",
+        description: "Test our new NFT marketplace features including minting, trading, and collection management",
         status: "active",
-        responses: 24,
-        totalVotes: 50,
-        endDate: "2024-01-15",
-        createdBy: "user_123",
-        category: "Technology",
+        applicationsReceived: 12,
+        testersNeeded: 25,
+        endDate: "2024-02-15",
+        createdBy: "demo_user",
+        category: "NFT Platform",
+        paymentRange: { min: 200, max: 500 },
+        difficulty: "Advanced"
       },
       {
-        id: "poll_2",
-        title: "DeFi Protocol User Experience",
-        description: "Rate your experience with different DeFi protocols",
-        status: "closed",
-        responses: 156,
-        totalVotes: 156,
-        endDate: "2023-12-20",
-        createdBy: "user_123",
-        category: "Finance",
+        id: "project_2",
+        title: "Mobile Gaming App UX Testing",
+        description: "Help us test our Web3 mobile game user experience and gameplay mechanics",
+        status: "completed",
+        applicationsReceived: 30,
+        testersNeeded: 30,
+        endDate: "2024-01-30",
+        createdBy: "demo_user",
+        category: "Gaming",
+        paymentRange: { min: 150, max: 350 },
+        difficulty: "Intermediate"
       },
     ])
 
-    setAvailablePolls([
+    // Mock data for tester applications
+    setMyApplications([
       {
-        id: "poll_3",
-        title: "NFT Marketplace Preferences",
-        description: "Which NFT marketplace features matter most to you?",
-        status: "active",
-        responses: 89,
-        totalVotes: 200,
-        endDate: "2024-01-20",
-        createdBy: "user_456",
-        category: "NFTs",
+        id: "app_1",
+        projectId: "project_3",
+        projectTitle: "DeFi Protocol Security Testing",
+        status: "accepted",
+        appliedDate: "2024-01-15",
+        category: "DeFi Protocol",
+        paymentRange: { min: 300, max: 750 }
       },
       {
-        id: "poll_4",
-        title: "Blockchain Scalability Solutions",
-        description: "Share your thoughts on Layer 2 scaling solutions",
-        status: "active",
-        responses: 45,
-        totalVotes: 100,
-        endDate: "2024-01-18",
-        createdBy: "user_789",
-        category: "Technology",
+        id: "app_2",
+        projectId: "project_4",
+        projectTitle: "E-commerce AR Shopping Experience",
+        status: "pending",
+        appliedDate: "2024-01-18",
+        category: "E-commerce",
+        paymentRange: { min: 200, max: 450 }
+      },
+      {
+        id: "app_3",
+        projectId: "project_5",
+        projectTitle: "Social Web3 Platform Testing",
+        status: "completed",
+        appliedDate: "2024-01-10",
+        category: "Social Platform",
+        paymentRange: { min: 100, max: 250 }
       },
     ])
   }, [])
@@ -163,14 +208,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5" suppressHydrationWarning>
       {/* Header */}
-      <header
-        ref={headerReveal.ref}
-        className={`border-b border-border/50 backdrop-blur-sm bg-background/80 transition-all duration-1000 ease-out ${
-          headerReveal.isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
-        }`}
-      >
+      <header className="border-b border-border/50 backdrop-blur-sm bg-background/80">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
@@ -179,10 +219,16 @@ export default function DashboardPage() {
             <span className="text-xl font-bold text-foreground">Moca Edge</span>
           </Link>
           <div className="flex items-center space-x-4">
+            <Button asChild variant="ghost">
+              <Link href="/browse">Browse Projects</Link>
+            </Button>
+            <Button asChild variant="ghost">
+              <Link href="/create-project">Post Project</Link>
+            </Button>
             <Button asChild variant="outline">
-              <Link href="/profile">
+              <Link href="/reputation">
                 <User className="w-4 h-4 mr-2" />
-                Profile
+                My Profile
               </Link>
             </Button>
             <Avatar className="w-8 h-8">
@@ -195,16 +241,11 @@ export default function DashboardPage() {
 
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Welcome Section */}
-        <div
-          ref={statsReveal.ref}
-          className={`mb-8 transition-all duration-1000 ease-out delay-200 ${
-            statsReveal.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
+        <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold mb-2">Welcome back, {userProfile.username}!</h1>
-              <p className="text-muted-foreground">Manage your polls and track your reputation progress.</p>
+              <p className="text-muted-foreground">Manage your testing projects and track your tester reputation.</p>
             </div>
             <div className="text-right">
               <div className="flex items-center space-x-2 mb-2">
@@ -222,8 +263,8 @@ export default function DashboardPage() {
                 <div className="flex items-center space-x-2">
                   <BarChart3 className="w-8 h-8 text-primary" />
                   <div>
-                    <p className="text-2xl font-bold">{userPolls.length}</p>
-                    <p className="text-sm text-muted-foreground">Polls Created</p>
+                    <p className="text-2xl font-bold">{userProjects.length}</p>
+                    <p className="text-sm text-muted-foreground">Projects Posted</p>
                   </div>
                 </div>
               </CardContent>
@@ -233,8 +274,8 @@ export default function DashboardPage() {
                 <div className="flex items-center space-x-2">
                   <Vote className="w-8 h-8 text-green-500" />
                   <div>
-                    <p className="text-2xl font-bold">12</p>
-                    <p className="text-sm text-muted-foreground">Polls Answered</p>
+                    <p className="text-2xl font-bold">{myApplications.length}</p>
+                    <p className="text-sm text-muted-foreground">Test Applications</p>
                   </div>
                 </div>
               </CardContent>
@@ -244,8 +285,8 @@ export default function DashboardPage() {
                 <div className="flex items-center space-x-2">
                   <Users className="w-8 h-8 text-blue-500" />
                   <div>
-                    <p className="text-2xl font-bold">180</p>
-                    <p className="text-sm text-muted-foreground">Total Responses</p>
+                    <p className="text-2xl font-bold">{userProjects.reduce((sum, p) => sum + p.applicationsReceived, 0)}</p>
+                    <p className="text-sm text-muted-foreground">Total Applications</p>
                   </div>
                 </div>
               </CardContent>
@@ -265,17 +306,12 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Content */}
-        <div
-          ref={contentReveal.ref}
-          className={`transition-all duration-1000 ease-out delay-400 ${
-            contentReveal.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
+        <div>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="builder">Builder</TabsTrigger>
-              <TabsTrigger value="contributor">Contributor</TabsTrigger>
+              <TabsTrigger value="builder">My Projects</TabsTrigger>
+              <TabsTrigger value="contributor">My Applications</TabsTrigger>
             </TabsList>
 
             {/* Overview Tab */}
@@ -293,15 +329,15 @@ export default function DashboardPage() {
                       <div className="flex items-center space-x-3">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium">Answered "NFT Marketplace Preferences"</p>
+                          <p className="text-sm font-medium">Applied to "DeFi Protocol Security Testing"</p>
                           <p className="text-xs text-muted-foreground">2 hours ago</p>
                         </div>
-                        <Badge variant="secondary">+10 Rep</Badge>
+                        <Badge variant="secondary">Application Sent</Badge>
                       </div>
                       <div className="flex items-center space-x-3">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium">Created "Web3 Development Framework" poll</p>
+                          <p className="text-sm font-medium">Posted "NFT Marketplace Beta Testing"</p>
                           <p className="text-xs text-muted-foreground">1 day ago</p>
                         </div>
                         <Badge variant="secondary">+5 Rep</Badge>
@@ -309,10 +345,10 @@ export default function DashboardPage() {
                       <div className="flex items-center space-x-3">
                         <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium">Poll reached 50 responses</p>
+                          <p className="text-sm font-medium">Completed testing for "Social Web3 Platform"</p>
                           <p className="text-xs text-muted-foreground">2 days ago</p>
                         </div>
-                        <Badge variant="secondary">+15 Rep</Badge>
+                        <Badge variant="secondary">+25 Rep</Badge>
                       </div>
                     </div>
                   </CardContent>
@@ -338,9 +374,9 @@ export default function DashboardPage() {
                         <p>Next milestone: Advanced (500 reputation)</p>
                         <p className="mt-2">Ways to earn reputation:</p>
                         <ul className="list-disc list-inside mt-1 space-y-1">
-                          <li>Answer polls (+10 rep each)</li>
-                          <li>Create popular polls (+5-20 rep)</li>
-                          <li>Receive positive feedback (+1-5 rep)</li>
+                          <li>Complete testing projects (+10-50 rep)</li>
+                          <li>Post successful projects (+5-20 rep)</li>
+                          <li>Receive high-quality ratings (+1-10 rep)</li>
                         </ul>
                       </div>
                     </div>
@@ -349,68 +385,72 @@ export default function DashboardPage() {
               </div>
             </TabsContent>
 
-            {/* Builder Tab */}
+            {/* My Projects Tab */}
             <TabsContent value="builder" className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold">Your Polls</h2>
+                <h2 className="text-2xl font-bold">Your Testing Projects</h2>
                 <Button asChild>
-                  <Link href="/polls/create">
+                  <Link href="/create-project">
                     <Plus className="w-4 h-4 mr-2" />
-                    Create Poll
+                    Post New Project
                   </Link>
                 </Button>
               </div>
 
               <div className="grid gap-4">
-                {userPolls.map((poll) => (
-                  <Card key={poll.id} className="hover:shadow-md transition-shadow">
+                {userProjects.map((project) => (
+                  <Card key={project.id} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
-                            <h3 className="text-lg font-semibold">{poll.title}</h3>
-                            <Badge variant="secondary" className={`${getStatusColor(poll.status)} text-white`}>
-                              {getStatusIcon(poll.status)}
-                              <span className="ml-1 capitalize">{poll.status}</span>
+                            <h3 className="text-lg font-semibold">{project.title}</h3>
+                            <Badge variant="secondary" className={`${getStatusColor(project.status)} text-white`}>
+                              {getStatusIcon(project.status)}
+                              <span className="ml-1 capitalize">{project.status}</span>
                             </Badge>
+                            <Badge variant="outline">{project.difficulty}</Badge>
                           </div>
-                          <p className="text-muted-foreground mb-3">{poll.description}</p>
+                          <p className="text-muted-foreground mb-3">{project.description}</p>
                           <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                             <div className="flex items-center space-x-1">
                               <Users className="w-4 h-4" />
-                              <span>{poll.responses} responses</span>
+                              <span>{project.applicationsReceived} applications</span>
                             </div>
                             <div className="flex items-center space-x-1">
                               <Calendar className="w-4 h-4" />
-                              <span>Ends {poll.endDate}</span>
+                              <span>Deadline {project.endDate}</span>
                             </div>
-                            <Badge variant="outline">{poll.category}</Badge>
+                            <div className="flex items-center space-x-1 text-green-600">
+                              <span>${project.paymentRange.min}-{project.paymentRange.max}</span>
+                            </div>
+                            <Badge variant="outline">{project.category}</Badge>
                           </div>
                         </div>
                         <div className="flex space-x-2">
                           <Button variant="outline" size="sm" asChild>
-                            <Link href={`/polls/${poll.id}/results`}>
+                            <Link href={`/projects/${project.id}`}>
                               <Eye className="w-4 h-4 mr-1" />
-                              View Results
+                              View Details
                             </Link>
                           </Button>
                           <Button variant="outline" size="sm" asChild>
-                            <Link href={`/polls/${poll.id}`}>
+                            <Link href={`/projects/${project.id}/manage`}>
                               <BarChart3 className="w-4 h-4 mr-1" />
                               Manage
                             </Link>
                           </Button>
                         </div>
                       </div>
-                      {poll.status === "active" && (
+                      {project.status === "active" && (
                         <div className="mt-4">
                           <div className="flex justify-between text-sm mb-1">
-                            <span>Response Progress</span>
+                            <span>Applications Progress</span>
                             <span>
-                              {poll.responses}/{poll.totalVotes}
+                              {project.applicationsReceived}/{project.testersNeeded}
                             </span>
                           </div>
-                          <Progress value={(poll.responses / poll.totalVotes) * 100} className="h-2" />
+                          <Progress value={(project.applicationsReceived / project.testersNeeded) * 100} className="h-2" />
                         </div>
                       )}
                     </CardContent>
@@ -419,67 +459,80 @@ export default function DashboardPage() {
               </div>
             </TabsContent>
 
-            {/* Contributor Tab */}
+            {/* My Applications Tab */}
             <TabsContent value="contributor" className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold">Available Polls</h2>
+                <h2 className="text-2xl font-bold">My Testing Applications</h2>
                 <Button variant="outline" asChild>
-                  <Link href="/polls">
+                  <Link href="/browse">
                     <Eye className="w-4 h-4 mr-2" />
-                    Browse All
+                    Browse Projects
                   </Link>
                 </Button>
               </div>
 
               <div className="grid gap-4">
-                {availablePolls.map((poll) => (
-                  <Card key={poll.id} className="hover:shadow-md transition-shadow">
+                {myApplications.map((application) => (
+                  <Card key={application.id} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
-                            <h3 className="text-lg font-semibold">{poll.title}</h3>
-                            <Badge variant="secondary" className="bg-green-500 text-white">
-                              <CheckCircle className="w-4 h-4 mr-1" />
-                              Active
+                            <h3 className="text-lg font-semibold">{application.projectTitle}</h3>
+                            <Badge
+                              variant="secondary"
+                              className={`${
+                                application.status === 'accepted' ? 'bg-green-500' :
+                                application.status === 'pending' ? 'bg-yellow-500' :
+                                application.status === 'rejected' ? 'bg-red-500' :
+                                'bg-blue-500'
+                              } text-white`}
+                            >
+                              <span className="capitalize">{application.status}</span>
                             </Badge>
                           </div>
-                          <p className="text-muted-foreground mb-3">{poll.description}</p>
-                          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                            <div className="flex items-center space-x-1">
-                              <Users className="w-4 h-4" />
-                              <span>{poll.responses} responses</span>
-                            </div>
+                          <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-3">
                             <div className="flex items-center space-x-1">
                               <Calendar className="w-4 h-4" />
-                              <span>Ends {poll.endDate}</span>
+                              <span>Applied {application.appliedDate}</span>
                             </div>
-                            <Badge variant="outline">{poll.category}</Badge>
+                            <div className="flex items-center space-x-1 text-green-600">
+                              <span>${application.paymentRange.min}-{application.paymentRange.max}</span>
+                            </div>
+                            <Badge variant="outline">{application.category}</Badge>
                           </div>
+                          {application.status === 'pending' && (
+                            <p className="text-sm text-muted-foreground">
+                              Your application is being reviewed by the project team.
+                            </p>
+                          )}
+                          {application.status === 'accepted' && (
+                            <p className="text-sm text-green-600 font-medium">
+                              ✅ Congratulations! You've been selected for this testing project.
+                            </p>
+                          )}
+                          {application.status === 'completed' && (
+                            <p className="text-sm text-blue-600 font-medium">
+                              🎉 Project completed successfully! Payment processed.
+                            </p>
+                          )}
                         </div>
                         <div className="flex space-x-2">
-                          <Button size="sm" asChild>
-                            <Link href={`/polls/${poll.id}/participate`}>
-                              <Vote className="w-4 h-4 mr-1" />
-                              Participate
-                            </Link>
-                          </Button>
                           <Button variant="outline" size="sm" asChild>
-                            <Link href={`/polls/${poll.id}`}>
+                            <Link href={`/projects/${application.projectId}`}>
                               <Eye className="w-4 h-4 mr-1" />
-                              View Details
+                              View Project
                             </Link>
                           </Button>
+                          {application.status === 'accepted' && (
+                            <Button size="sm" asChild>
+                              <Link href={`/projects/${application.projectId}/test`}>
+                                <Vote className="w-4 h-4 mr-1" />
+                                Start Testing
+                              </Link>
+                            </Button>
+                          )}
                         </div>
-                      </div>
-                      <div className="mt-4">
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Participation Progress</span>
-                          <span>
-                            {poll.responses}/{poll.totalVotes}
-                          </span>
-                        </div>
-                        <Progress value={(poll.responses / poll.totalVotes) * 100} className="h-2" />
                       </div>
                     </CardContent>
                   </Card>
@@ -488,26 +541,28 @@ export default function DashboardPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Reputation Summary</CardTitle>
-                  <CardDescription>Your contribution activity at a glance</CardDescription>
+                  <CardTitle>Tester Stats</CardTitle>
+                  <CardDescription>Your testing activity summary</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">12</div>
-                      <div className="text-sm text-muted-foreground">Polls Answered</div>
+                      <div className="text-2xl font-bold text-primary">{myApplications.length}</div>
+                      <div className="text-sm text-muted-foreground">Applications</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-green-500">120</div>
-                      <div className="text-sm text-muted-foreground">Rep from Polls</div>
+                      <div className="text-2xl font-bold text-green-500">{myApplications.filter(a => a.status === 'accepted').length}</div>
+                      <div className="text-sm text-muted-foreground">Accepted</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-500">8</div>
-                      <div className="text-sm text-muted-foreground">Helpful Votes</div>
+                      <div className="text-2xl font-bold text-blue-500">{myApplications.filter(a => a.status === 'completed').length}</div>
+                      <div className="text-sm text-muted-foreground">Completed</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-purple-500">3</div>
-                      <div className="text-sm text-muted-foreground">Badges Earned</div>
+                      <div className="text-2xl font-bold text-purple-500">
+                        ${myApplications.filter(a => a.status === 'completed').reduce((sum, a) => sum + a.paymentRange.max, 0)}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Total Earned</div>
                     </div>
                   </div>
                 </CardContent>

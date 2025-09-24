@@ -287,6 +287,9 @@ export default function MarketplacePage() {
             <span className="text-xl font-bold text-foreground">Early Tester Marketplace</span>
           </Link>
           <div className="flex items-center space-x-4">
+            <Button asChild variant="ghost">
+              <Link href="/browse">Browse Projects</Link>
+            </Button>
             <Button asChild variant="outline">
               <Link href="/dashboard">Dashboard</Link>
             </Button>
