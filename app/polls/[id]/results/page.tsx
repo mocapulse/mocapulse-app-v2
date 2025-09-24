@@ -180,7 +180,7 @@ export default function PollResultsPage({ params }: { params: { id: string } }) 
             </Button>
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">MP</span>
+                <span className="text-primary-foreground font-bold text-sm">ME</span>
               </div>
               <span className="text-xl font-bold text-foreground">Poll Results</span>
             </div>

@@ -1,15 +1,16 @@
-# Moca Pulse
+# Moca Edge
 
-**Verifiable Feedback & Reputation on Moca Network**
+**Early Tester Marketplace - Vetted Testers • Fast Feedback • On-Chain Reputation**
 
-A decentralized application built for the Moca Network that enables users to participate in polls, build reputation, and create verifiable credentials through the Moca AIR Kit integration.
+A decentralized application built for the Moca Network that connects enterprises with verified early testers, enabling quality feedback collection and tester reputation building through the Moca AIR Kit integration.
 
 ## 🚀 Features
 
 - **🔐 Moca AIR Kit Integration**: Secure decentralized identity management
-- **📊 Poll System**: Create and participate in community polls
-- **🏆 Reputation System**: Build verifiable reputation through participation
-- **📜 Verifiable Credentials**: On-chain proof of poll participation and achievements
+- **🎯 Testing Marketplace**: Connect enterprises with vetted early testers
+- **⚡ Speed Credentials**: Track feedback turnaround time and quality metrics
+- **🏆 Reputation System**: Build verifiable reputation through quality testing
+- **📜 Verifiable Credentials**: On-chain proof of testing expertise and achievements
 - **🌐 Decentralized Identity**: Self-sovereign identity powered by Moca Network
 
 ## 📋 Prerequisites

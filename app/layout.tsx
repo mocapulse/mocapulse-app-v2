@@ -6,7 +6,7 @@ import { AirKitProvider } from '@/contexts/airkit-context'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Moca Pulse',
+  title: 'Moca Edge',
   description: 'Verifiable Feedback & Reputation on Moca Network',
   generator: 'v0.app',
 }

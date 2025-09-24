@@ -33,7 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-interface Poll {
+interface TestingRequest {
   id: string
   title: string
   description: string
@@ -41,187 +41,203 @@ interface Poll {
   type: "single" | "multiple"
   status: "active" | "closed" | "upcoming"
   responses: number
-  totalVotes: number
+  maxTesters: number
   endDate: string
   createdBy: string
-  createdByUsername: string
+  companyName: string
   isAnonymous: boolean
   requiresReputation: boolean
   minReputation: number
   reputationReward: number
+  avgTurnaroundTime: number
+  qualityThreshold: number
   featured?: boolean
   trending?: boolean
+  urgent?: boolean
 }
 
 const CATEGORIES = [
   "All Categories",
-  "NFTs",
-  "DeFi",
+  "Mobile App",
+  "Web Application",
+  "Web3 DApp",
+  "NFT Platform",
+  "DeFi Protocol",
   "Gaming",
-  "Community",
-  "Governance",
-  "Technology",
-  "Culture",
-  "Education"
+  "FinTech",
+  "Other"
 ]
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
-  { value: "popular", label: "Most Popular" },
-  { value: "ending-soon", label: "Ending Soon" },
+  { value: "popular", label: "Most Testers Needed" },
+  { value: "ending-soon", label: "Deadline Soon" },
   { value: "highest-reward", label: "Highest Reward" },
-  { value: "trending", label: "Trending" }
+  { value: "urgent", label: "Urgent Testing" }
 ]
 
-export default function PollsPage() {
+export default function MarketplacePage() {
   const { user, isAuthenticated } = useAirKit()
-  const [polls, setPolls] = useState<Poll[]>([])
-  const [filteredPolls, setFilteredPolls] = useState<Poll[]>([])
+  const [testingRequests, setTestingRequests] = useState<TestingRequest[]>([])
+  const [filteredRequests, setFilteredRequests] = useState<TestingRequest[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("All Categories")
   const [sortBy, setSortBy] = useState("newest")
   const [statusFilter, setStatusFilter] = useState("all")
   const [isLoading, setIsLoading] = useState(true)
 
-  // Mock poll data
+  // Mock testing request data
   useEffect(() => {
-    const mockPolls: Poll[] = [
+    const mockTestingRequests: TestingRequest[] = [
       {
         id: "1",
-        title: "NFT Marketplace Preferences",
-        description: "Help us understand what features matter most to you in NFT marketplaces. Your feedback will shape the future of digital asset trading.",
-        category: "NFTs",
+        title: "NFT Marketplace Beta Testing",
+        description: "Test our new NFT marketplace features including minting, trading, and collection management. We need detailed feedback on user experience and any bugs found.",
+        category: "NFT Platform",
         type: "multiple",
         status: "active",
-        responses: 89,
-        totalVotes: 200,
+        responses: 12,
+        maxTesters: 25,
         endDate: "2024-02-15",
         createdBy: "user_456",
-        createdByUsername: "CryptoBuilder",
+        companyName: "CryptoBuilder Inc",
         isAnonymous: false,
         requiresReputation: true,
-        minReputation: 50,
-        reputationReward: 15,
+        minReputation: 150,
+        reputationReward: 50,
+        avgTurnaroundTime: 48,
+        qualityThreshold: 85,
         featured: true,
-        trending: true
+        trending: true,
+        urgent: false
       },
       {
         id: "2",
-        title: "DeFi Protocol Security Standards",
-        description: "What security measures do you consider most important for DeFi protocols?",
-        category: "DeFi",
+        title: "DeFi Protocol Security Testing",
+        description: "Help us test the security and usability of our new DeFi lending protocol. Looking for experienced testers who can identify potential vulnerabilities.",
+        category: "DeFi Protocol",
         type: "single",
         status: "active",
-        responses: 156,
-        totalVotes: 300,
+        responses: 8,
+        maxTesters: 15,
         endDate: "2024-02-20",
         createdBy: "user_789",
-        createdByUsername: "DefiExpert",
+        companyName: "DefiSecure",
         isAnonymous: true,
         requiresReputation: true,
-        minReputation: 100,
-        reputationReward: 20,
-        trending: true
+        minReputation: 200,
+        reputationReward: 75,
+        avgTurnaroundTime: 24,
+        qualityThreshold: 90,
+        trending: true,
+        urgent: true
       },
       {
         id: "3",
-        title: "Gaming Token Economics",
-        description: "Share your thoughts on sustainable tokenomics for blockchain games.",
+        title: "Mobile Gaming App Testing",
+        description: "Test our new Web3 mobile game. We need feedback on gameplay mechanics, token integration, and overall user experience.",
         category: "Gaming",
         type: "multiple",
         status: "active",
-        responses: 67,
-        totalVotes: 150,
+        responses: 18,
+        maxTesters: 30,
         endDate: "2024-02-10",
         createdBy: "user_123",
-        createdByUsername: "GameDev",
+        companyName: "GameFi Studios",
         isAnonymous: false,
         requiresReputation: false,
         minReputation: 0,
-        reputationReward: 10
+        reputationReward: 30,
+        avgTurnaroundTime: 72,
+        qualityThreshold: 75,
+        urgent: false
       },
       {
         id: "4",
-        title: "Community Governance Proposal",
-        description: "Vote on the proposed changes to community guidelines and moderation policies.",
-        category: "Governance",
+        title: "FinTech Banking App Testing",
+        description: "Test our new digital banking app features including instant transfers, crypto integration, and mobile payments.",
+        category: "FinTech",
         type: "single",
         status: "upcoming",
         responses: 0,
-        totalVotes: 500,
+        maxTesters: 20,
         endDate: "2024-02-25",
-        createdBy: "user_admin",
-        createdByUsername: "MocaTeam",
+        createdBy: "user_bank",
+        companyName: "NeoBank",
         isAnonymous: false,
         requiresReputation: true,
-        minReputation: 200,
-        reputationReward: 25,
+        minReputation: 100,
+        reputationReward: 40,
+        avgTurnaroundTime: 36,
+        qualityThreshold: 80,
         featured: true
       },
       {
         id: "5",
-        title: "Web3 Education Priorities",
-        description: "What topics should we prioritize in our Web3 education initiatives?",
-        category: "Education",
+        title: "Web3 Social Platform Testing",
+        description: "Help us test our decentralized social media platform. Focus on user onboarding, content creation, and token rewards system.",
+        category: "Web3 DApp",
         type: "multiple",
         status: "closed",
-        responses: 234,
-        totalVotes: 234,
+        responses: 25,
+        maxTesters: 25,
         endDate: "2024-01-30",
-        createdBy: "user_edu",
-        createdByUsername: "Web3Educator",
+        createdBy: "user_social",
+        companyName: "SocialWeb3",
         isAnonymous: false,
         requiresReputation: false,
         minReputation: 0,
-        reputationReward: 5
+        reputationReward: 35,
+        avgTurnaroundTime: 60,
+        qualityThreshold: 70
       }
     ]
 
-    setPolls(mockPolls)
+    setTestingRequests(mockTestingRequests)
     setIsLoading(false)
   }, [])
 
-  // Filter and sort polls
+  // Filter and sort testing requests
   useEffect(() => {
-    let filtered = [...polls]
+    let filtered = [...testingRequests]
 
     // Search filter
     if (searchQuery) {
-      filtered = filtered.filter(poll =>
-        poll.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        poll.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        poll.createdByUsername.toLowerCase().includes(searchQuery.toLowerCase())
+      filtered = filtered.filter(request =>
+        request.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        request.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        request.companyName.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
 
     // Category filter
     if (selectedCategory !== "All Categories") {
-      filtered = filtered.filter(poll => poll.category === selectedCategory)
+      filtered = filtered.filter(request => request.category === selectedCategory)
     }
 
     // Status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter(poll => poll.status === statusFilter)
+      filtered = filtered.filter(request => request.status === statusFilter)
     }
 
     // Sort
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "popular":
-          return b.responses - a.responses
+          return (b.maxTesters - b.responses) - (a.maxTesters - a.responses)
         case "ending-soon":
           return new Date(a.endDate).getTime() - new Date(b.endDate).getTime()
         case "highest-reward":
           return b.reputationReward - a.reputationReward
-        case "trending":
-          return (b.trending ? 1 : 0) - (a.trending ? 1 : 0)
+        case "urgent":
+          return (b.urgent ? 1 : 0) - (a.urgent ? 1 : 0)
         default: // newest
           return b.id.localeCompare(a.id)
       }
     })
 
-    setFilteredPolls(filtered)
-  }, [polls, searchQuery, selectedCategory, sortBy, statusFilter])
+    setFilteredRequests(filtered)
+  }, [testingRequests, searchQuery, selectedCategory, sortBy, statusFilter])
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -253,7 +269,7 @@ export default function PollsPage() {
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading polls...</p>
+          <p className="text-muted-foreground">Loading testing opportunities...</p>
         </div>
       </div>
     )
@@ -266,9 +282,9 @@ export default function PollsPage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">MP</span>
+              <span className="text-primary-foreground font-bold text-sm">ME</span>
             </div>
-            <span className="text-xl font-bold text-foreground">Moca Pulse</span>
+            <span className="text-xl font-bold text-foreground">Early Tester Marketplace</span>
           </Link>
           <div className="flex items-center space-x-4">
             <Button asChild variant="outline">
@@ -277,7 +293,7 @@ export default function PollsPage() {
             <Button asChild>
               <Link href="/polls/create">
                 <Plus className="w-4 h-4 mr-2" />
-                Create Poll
+                Create Testing Request
               </Link>
             </Button>
             <ConnectButton />
@@ -288,9 +304,9 @@ export default function PollsPage() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Explore Polls</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Testing Marketplace</h1>
           <p className="text-muted-foreground text-lg">
-            Discover polls, share your opinions, and build your reputation in the Moca community.
+            Find testing opportunities, provide quality feedback, and earn reputation as a verified early tester.
           </p>
         </div>
 
@@ -300,8 +316,8 @@ export default function PollsPage() {
             <div className="flex items-center space-x-2">
               <Vote className="w-5 h-5 text-primary" />
               <div>
-                <p className="text-2xl font-bold">{polls.length}</p>
-                <p className="text-sm text-muted-foreground">Total Polls</p>
+                <p className="text-2xl font-bold">{testingRequests.length}</p>
+                <p className="text-sm text-muted-foreground">Testing Requests</p>
               </div>
             </div>
           </Card>
@@ -472,7 +488,7 @@ export default function PollsPage() {
             <Button asChild>
               <Link href="/polls/create">
                 <Plus className="w-4 h-4 mr-2" />
-                Create Poll
+                Create Testing Request
               </Link>
             </Button>
           </Card>

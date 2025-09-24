@@ -55,7 +55,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Load user profile
-    const savedProfile = localStorage.getItem("mocaPulseProfile")
+    const savedProfile = localStorage.getItem("mocaEdgeProfile")
     if (savedProfile) {
       const profile = JSON.parse(savedProfile)
       setUserProfile({
@@ -174,9 +174,9 @@ export default function DashboardPage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">MP</span>
+              <span className="text-primary-foreground font-bold text-sm">ME</span>
             </div>
-            <span className="text-xl font-bold text-foreground">Moca Pulse</span>
+            <span className="text-xl font-bold text-foreground">Moca Edge</span>
           </Link>
           <div className="flex items-center space-x-4">
             <Button asChild variant="outline">

@@ -132,10 +132,10 @@ export default function CreatePollPage() {
   }
 
   const steps = [
-    { number: 1, title: "Basic Info", description: "Title, description, and category" },
-    { number: 2, title: "Options", description: "Poll options and type" },
-    { number: 3, title: "Settings", description: "Duration and advanced settings" },
-    { number: 4, title: "Review", description: "Review and publish" },
+    { number: 1, title: "Project Info", description: "Project details and testing scope" },
+    { number: 2, title: "Questions", description: "Feedback questions and requirements" },
+    { number: 3, title: "Tester Requirements", description: "Duration and tester criteria" },
+    { number: 4, title: "Review", description: "Review and publish to marketplace" },
   ]
 
   return (
@@ -157,9 +157,9 @@ export default function CreatePollPage() {
             </Button>
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">MP</span>
+                <span className="text-primary-foreground font-bold text-sm">ME</span>
               </div>
-              <span className="text-xl font-bold text-foreground">Create Poll</span>
+              <span className="text-xl font-bold text-foreground">Create Testing Request</span>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -219,15 +219,15 @@ export default function CreatePollPage() {
           {currentStep === 1 && (
             <Card>
               <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
-                <CardDescription>Provide the basic details for your poll</CardDescription>
+                <CardTitle>Project Information</CardTitle>
+                <CardDescription>Describe your project and what you need tested</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <Label htmlFor="title">Poll Title *</Label>
+                  <Label htmlFor="title">Project/Product Name *</Label>
                   <Input
                     id="title"
-                    placeholder="Enter a clear, descriptive title for your poll"
+                    placeholder="e.g., Mobile Banking App, NFT Marketplace, Web3 Game"
                     value={form.title}
                     onChange={(e) => setForm({ ...form, title: e.target.value })}
                     className="mt-1"
@@ -235,10 +235,10 @@ export default function CreatePollPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="description">Description *</Label>
+                  <Label htmlFor="description">Testing Scope & Context *</Label>
                   <Textarea
                     id="description"
-                    placeholder="Provide context and details about what you're asking"
+                    placeholder="What do you need tested? Describe the key features, user flows, or areas you want feedback on"
                     value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
                     className="mt-1 min-h-[100px]"
@@ -246,18 +246,19 @@ export default function CreatePollPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="category">Category *</Label>
+                  <Label htmlFor="category">Project Category *</Label>
                   <Select value={form.category} onValueChange={(value) => setForm({ ...form, category: value })}>
                     <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue placeholder="Select project type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="technology">Technology</SelectItem>
-                      <SelectItem value="finance">Finance</SelectItem>
-                      <SelectItem value="nfts">NFTs</SelectItem>
-                      <SelectItem value="defi">DeFi</SelectItem>
+                      <SelectItem value="mobile-app">Mobile App</SelectItem>
+                      <SelectItem value="web-app">Web Application</SelectItem>
+                      <SelectItem value="web3-dapp">Web3 DApp</SelectItem>
+                      <SelectItem value="nft-platform">NFT Platform</SelectItem>
+                      <SelectItem value="defi-protocol">DeFi Protocol</SelectItem>
                       <SelectItem value="gaming">Gaming</SelectItem>
-                      <SelectItem value="governance">Governance</SelectItem>
+                      <SelectItem value="fintech">FinTech</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
@@ -268,7 +269,7 @@ export default function CreatePollPage() {
                     onClick={() => setCurrentStep(2)}
                     disabled={!form.title || !form.description || !form.category}
                   >
-                    Next: Options
+                    Next: Questions
                   </Button>
                 </div>
               </CardContent>
@@ -279,12 +280,12 @@ export default function CreatePollPage() {
           {currentStep === 2 && (
             <Card>
               <CardHeader>
-                <CardTitle>Poll Options</CardTitle>
-                <CardDescription>Configure the options and response type</CardDescription>
+                <CardTitle>Feedback Questions</CardTitle>
+                <CardDescription>What specific feedback do you want from testers?</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <Label>Response Type</Label>
+                  <Label>Feedback Type</Label>
                   <RadioGroup
                     value={form.type}
                     onValueChange={(value: "single" | "multiple") => setForm({ ...form, type: value })}
@@ -292,11 +293,11 @@ export default function CreatePollPage() {
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="single" id="single" />
-                      <Label htmlFor="single">Single Choice (users can select one option)</Label>
+                      <Label htmlFor="single">Structured Questions (specific choices)</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="multiple" id="multiple" />
-                      <Label htmlFor="multiple">Multiple Choice (users can select multiple options)</Label>
+                      <Label htmlFor="multiple">Open Feedback (multiple aspects)</Label>
                     </div>
                   </RadioGroup>
                 </div>
@@ -305,10 +306,10 @@ export default function CreatePollPage() {
 
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <Label>Poll Options *</Label>
+                    <Label>Feedback Questions *</Label>
                     <Button variant="outline" size="sm" onClick={addOption}>
                       <Plus className="w-4 h-4 mr-2" />
-                      Add Option
+                      Add Question
                     </Button>
                   </div>
 
@@ -317,7 +318,7 @@ export default function CreatePollPage() {
                       <div key={option.id} className="flex items-center space-x-2">
                         <div className="flex-1">
                           <Input
-                            placeholder={`Option ${index + 1}`}
+                            placeholder={`e.g., "How intuitive is the onboarding flow?", "Rate the UI design", "Any bugs found?"`}
                             value={option.text}
                             onChange={(e) => updateOption(option.id, e.target.value)}
                           />
@@ -340,7 +341,7 @@ export default function CreatePollPage() {
                     onClick={() => setCurrentStep(3)}
                     disabled={form.options.filter((opt) => opt.text.trim()).length < 2}
                   >
-                    Next: Settings
+                    Next: Requirements
                   </Button>
                 </div>
               </CardContent>
@@ -351,8 +352,8 @@ export default function CreatePollPage() {
           {currentStep === 3 && (
             <Card>
               <CardHeader>
-                <CardTitle>Poll Settings</CardTitle>
-                <CardDescription>Configure duration and advanced options</CardDescription>
+                <CardTitle>Tester Requirements</CardTitle>
+                <CardDescription>Set timeline and criteria for testers</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
@@ -368,24 +369,24 @@ export default function CreatePollPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="duration">Duration</Label>
+                    <Label htmlFor="duration">Testing Period</Label>
                     <Select value={form.duration} onValueChange={handleDurationChange}>
                       <SelectTrigger className="mt-1">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1">1 Day</SelectItem>
-                        <SelectItem value="3">3 Days</SelectItem>
-                        <SelectItem value="7">1 Week</SelectItem>
-                        <SelectItem value="14">2 Weeks</SelectItem>
-                        <SelectItem value="30">1 Month</SelectItem>
+                        <SelectItem value="1">1 Day (Fast Feedback)</SelectItem>
+                        <SelectItem value="3">3 Days (Standard)</SelectItem>
+                        <SelectItem value="7">1 Week (Detailed Testing)</SelectItem>
+                        <SelectItem value="14">2 Weeks (Comprehensive)</SelectItem>
+                        <SelectItem value="30">1 Month (Long-term)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
                 <div>
-                  <Label>End Date</Label>
+                  <Label>Testing Deadline</Label>
                   <div className="mt-1 p-2 bg-muted rounded-md text-sm">
                     {new Date(form.endDate).toLocaleDateString("en-US", {
                       weekday: "long",
@@ -399,7 +400,7 @@ export default function CreatePollPage() {
                 <Separator />
 
                 <div className="space-y-4">
-                  <h4 className="font-medium">Advanced Settings</h4>
+                  <h4 className="font-medium">Tester Criteria</h4>
 
                   <div className="flex items-center space-x-2">
                     <Checkbox
@@ -407,7 +408,7 @@ export default function CreatePollPage() {
                       checked={form.isAnonymous}
                       onCheckedChange={(checked) => setForm({ ...form, isAnonymous: checked as boolean })}
                     />
-                    <Label htmlFor="anonymous">Anonymous responses (hide voter identities)</Label>
+                    <Label htmlFor="anonymous">Allow anonymous feedback</Label>
                   </div>
 
                   <div className="space-y-2">
@@ -417,7 +418,7 @@ export default function CreatePollPage() {
                         checked={form.requiresReputation}
                         onCheckedChange={(checked) => setForm({ ...form, requiresReputation: checked as boolean })}
                       />
-                      <Label htmlFor="reputation">Require minimum reputation to participate</Label>
+                      <Label htmlFor="reputation">Require minimum reputation score</Label>
                     </div>
                     {form.requiresReputation && (
                       <div className="ml-6">
@@ -429,7 +430,9 @@ export default function CreatePollPage() {
                           onChange={(e) => setForm({ ...form, minReputation: Number.parseInt(e.target.value) || 0 })}
                           className="mt-1 w-32"
                           min="0"
+                          placeholder="e.g., 100"
                         />
+                        <p className="text-xs text-muted-foreground mt-1">Higher scores = more experienced testers</p>
                       </div>
                     )}
                   </div>
@@ -450,17 +453,17 @@ export default function CreatePollPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Review & Publish</CardTitle>
-                <CardDescription>Review your poll before publishing to the blockchain</CardDescription>
+                <CardDescription>Review your testing request before publishing to the marketplace</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-medium text-sm text-muted-foreground">TITLE</h4>
+                    <h4 className="font-medium text-sm text-muted-foreground">PROJECT</h4>
                     <p className="text-lg font-semibold">{form.title}</p>
                   </div>
 
                   <div>
-                    <h4 className="font-medium text-sm text-muted-foreground">DESCRIPTION</h4>
+                    <h4 className="font-medium text-sm text-muted-foreground">TESTING SCOPE</h4>
                     <p className="text-sm">{form.description}</p>
                   </div>
 
@@ -468,28 +471,28 @@ export default function CreatePollPage() {
                     <div>
                       <h4 className="font-medium text-sm text-muted-foreground">CATEGORY</h4>
                       <Badge variant="secondary" className="capitalize">
-                        {form.category}
+                        {form.category.replace('-', ' ')}
                       </Badge>
                     </div>
                     <div>
-                      <h4 className="font-medium text-sm text-muted-foreground">TYPE</h4>
+                      <h4 className="font-medium text-sm text-muted-foreground">FEEDBACK TYPE</h4>
                       <Badge variant="outline" className="capitalize">
-                        {form.type} Choice
+                        {form.type === 'single' ? 'Structured' : 'Open'} Feedback
                       </Badge>
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="font-medium text-sm text-muted-foreground">OPTIONS</h4>
+                    <h4 className="font-medium text-sm text-muted-foreground">FEEDBACK QUESTIONS</h4>
                     <div className="space-y-2 mt-2">
                       {form.options
                         .filter((opt) => opt.text.trim())
                         .map((option, index) => (
-                          <div key={option.id} className="flex items-center space-x-2">
-                            <div className="w-6 h-6 rounded-full border-2 border-muted-foreground flex items-center justify-center text-xs">
+                          <div key={option.id} className="flex items-start space-x-2">
+                            <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium mt-0.5">
                               {index + 1}
                             </div>
-                            <span>{option.text}</span>
+                            <span className="text-sm">{option.text}</span>
                           </div>
                         ))}
                     </div>
@@ -497,7 +500,7 @@ export default function CreatePollPage() {
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <h4 className="font-medium text-sm text-muted-foreground">DURATION</h4>
+                      <h4 className="font-medium text-sm text-muted-foreground">TESTING PERIOD</h4>
                       <div className="flex items-center space-x-2 mt-1">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
                         <span className="text-sm">
@@ -506,10 +509,11 @@ export default function CreatePollPage() {
                       </div>
                     </div>
                     <div>
-                      <h4 className="font-medium text-sm text-muted-foreground">SETTINGS</h4>
+                      <h4 className="font-medium text-sm text-muted-foreground">TESTER REQUIREMENTS</h4>
                       <div className="space-y-1 mt-1">
-                        {form.isAnonymous && <Badge variant="outline">Anonymous</Badge>}
+                        {form.isAnonymous && <Badge variant="outline">Anonymous OK</Badge>}
                         {form.requiresReputation && <Badge variant="outline">Min Rep: {form.minReputation}</Badge>}
+                        {!form.requiresReputation && <Badge variant="outline">All Skill Levels</Badge>}
                       </div>
                     </div>
                   </div>
@@ -519,10 +523,9 @@ export default function CreatePollPage() {
                   <div className="flex items-start space-x-2">
                     <AlertCircle className="w-5 h-5 text-blue-500 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-blue-900 dark:text-blue-100">Ready to Publish</h4>
+                      <h4 className="font-medium text-blue-900 dark:text-blue-100">Ready to Publish to Marketplace</h4>
                       <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                        Your poll will be registered on the Moca Network blockchain and become available for
-                        participation immediately.
+                        Your testing request will be registered on the Moca Network blockchain and become available to vetted testers immediately.
                       </p>
                     </div>
                   </div>
@@ -546,7 +549,7 @@ export default function CreatePollPage() {
                       ) : (
                         <>
                           <Send className="w-4 h-4 mr-2" />
-                          Publish Poll
+                          Publish to Marketplace
                         </>
                       )}
                     </Button>

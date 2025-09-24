@@ -39,7 +39,7 @@ export default function ProfilePage() {
     console.log('Profile effect - isAuthenticated:', isAuthenticated, 'user:', user)
 
     if (isAuthenticated && user) {
-      const savedProfile = localStorage.getItem("mocaPulseProfile")
+      const savedProfile = localStorage.getItem("mocaEdgeProfile")
       let userProfile: UserProfile
 
       if (savedProfile) {
@@ -75,7 +75,7 @@ export default function ProfilePage() {
         walletAddress: userProfile.walletAddress,
       })
 
-      localStorage.setItem("mocaPulseProfile", JSON.stringify(userProfile))
+      localStorage.setItem("mocaEdgeProfile", JSON.stringify(userProfile))
     } else {
       console.log('Clearing profile - not authenticated or no user')
       // Clear profile if not authenticated
@@ -94,7 +94,7 @@ export default function ProfilePage() {
     }
 
     setProfile(updatedProfile)
-    localStorage.setItem("mocaPulseProfile", JSON.stringify(updatedProfile))
+    localStorage.setItem("mocaEdgeProfile", JSON.stringify(updatedProfile))
     setIsEditing(false)
   }
 
@@ -128,9 +128,9 @@ export default function ProfilePage() {
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">MP</span>
+                <span className="text-primary-foreground font-bold text-sm">ME</span>
               </div>
-              <span className="text-xl font-bold text-foreground">Moca Pulse</span>
+              <span className="text-xl font-bold text-foreground">Moca Edge</span>
             </Link>
             <ConnectButton />
           </div>
@@ -140,7 +140,7 @@ export default function ProfilePage() {
         <div className="container mx-auto px-4 py-20 max-w-2xl text-center">
           <div className="mb-8">
             <Shield className="w-20 h-20 text-primary mx-auto mb-6" />
-            <h1 className="text-4xl font-bold mb-4">Welcome to Moca Pulse</h1>
+            <h1 className="text-4xl font-bold mb-4">Welcome to Moca Edge</h1>
             <p className="text-lg text-muted-foreground mb-8">
               Connect your Moca ID to access your decentralized identity and start building your reputation on-chain.
             </p>
@@ -174,9 +174,9 @@ export default function ProfilePage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">MP</span>
+              <span className="text-primary-foreground font-bold text-sm">ME</span>
             </div>
-            <span className="text-xl font-bold text-foreground">Moca Pulse</span>
+            <span className="text-xl font-bold text-foreground">Moca Edge</span>
           </Link>
           <div className="flex items-center space-x-4">
             <Button asChild variant="outline">

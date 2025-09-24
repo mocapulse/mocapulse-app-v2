@@ -21,9 +21,9 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">MP</span>
+              <span className="text-primary-foreground font-bold text-sm">ME</span>
             </div>
-            <span className="text-xl font-bold text-foreground">Moca Pulse</span>
+            <span className="text-xl font-bold text-foreground">Moca Edge</span>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
             <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -51,16 +51,15 @@ export default function LandingPage() {
           </Badge>
 
           <h1 className="text-5xl md:text-7xl font-bold text-balance mb-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            Moca Pulse
+            Early Tester Marketplace
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground mb-4 text-balance">
-            Verifiable Feedback & Reputation
+            Vetted Testers • Fast Feedback • On-Chain Reputation
           </p>
 
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto text-pretty">
-            Generate your ID, join polls, and build constructive reputation on-chain. The future of decentralized
-            feedback is here.
+            Connect enterprises with verified early testers. Build reputation through quality feedback and fast turnaround times. All verified on-chain.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -97,20 +96,20 @@ export default function LandingPage() {
             {[
               {
                 icon: Shield,
-                title: "Step 1 – Generate ID",
-                description: "Create your unique decentralized identity with cryptographic verification",
+                title: "Step 1 – Create Tester Profile",
+                description: "Generate your verified identity and showcase testing credentials",
                 delay: "delay-300",
               },
               {
                 icon: Users,
-                title: "Step 2 – Join Polls",
-                description: "Participate in community polls and surveys with transparent voting",
+                title: "Step 2 – Join Testing Requests",
+                description: "Participate in enterprise testing surveys and feedback sessions",
                 delay: "delay-500",
               },
               {
                 icon: TrendingUp,
-                title: "Step 3 – Build Reputation",
-                description: "Earn reputation points through constructive participation and feedback",
+                title: "Step 3 – Build Tester Reputation",
+                description: "Earn reputation through quality feedback and fast turnaround times",
                 delay: "delay-700",
               },
             ].map((step, index) => (
@@ -151,20 +150,20 @@ export default function LandingPage() {
             {[
               {
                 icon: Shield,
-                title: "Unique ID & Reputation",
-                description: "Cryptographically secure identity with verifiable reputation scoring",
+                title: "Verified Tester Profiles",
+                description: "Cryptographically secure identities with testing speed & quality metrics",
                 delay: "delay-500",
               },
               {
                 icon: Users,
-                title: "Poll Creation & Participation",
-                description: "Create and participate in polls with transparent, tamper-proof results",
+                title: "Enterprise Testing Requests",
+                description: "Companies post testing needs, vetted testers provide quality feedback",
                 delay: "delay-700",
               },
               {
                 icon: Zap,
-                title: "On-chain Transparency",
-                description: "All interactions recorded on blockchain for complete transparency",
+                title: "Fast Turnaround Tracking",
+                description: "Real-time tracking of feedback speed and quality, all on-chain",
                 delay: "delay-900",
               },
             ].map((feature, index) => (
@@ -193,9 +192,9 @@ export default function LandingPage() {
         }`}
       >
         <div className="container mx-auto text-center max-w-3xl">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-balance">Ready to Build Your Reputation?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-balance">Ready to Join the Marketplace?</h2>
           <p className="text-lg text-muted-foreground mb-8 text-pretty">
-            Join the future of decentralized feedback and start building your verifiable reputation today.
+            Whether you're an enterprise seeking quality testers or a tester looking to build reputation, start here.
           </p>
           <Button asChild size="lg" className="text-lg px-8 py-6">
             <Link href="/profile">
@@ -211,9 +210,9 @@ export default function LandingPage() {
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-6 h-6 bg-gradient-to-br from-primary to-accent rounded-md flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-xs">MP</span>
+              <span className="text-primary-foreground font-bold text-xs">ME</span>
             </div>
-            <span className="text-lg font-semibold">Moca Pulse</span>
+            <span className="text-lg font-semibold">Early Tester Marketplace</span>
           </div>
           <p className="text-muted-foreground mb-4">Built for Moca Network Buildathon</p>
           <div className="flex items-center justify-center space-x-1 text-sm text-muted-foreground">
