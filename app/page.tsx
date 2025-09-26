@@ -21,11 +21,20 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">MP</span>
+              <span className="text-primary-foreground font-bold text-sm">ME</span>
             </div>
-            <span className="text-xl font-bold text-foreground">Moca Pulse</span>
+            <span className="text-xl font-bold text-foreground">Moca Edge</span>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
+            <Link href="/browse" className="text-muted-foreground hover:text-foreground transition-colors">
+              Browse Projects
+            </Link>
+            <Link href="/create-project" className="text-muted-foreground hover:text-foreground transition-colors">
+              Post Project
+            </Link>
+            <Link href="/assessments" className="text-muted-foreground hover:text-foreground transition-colors">
+              Assessments
+            </Link>
             <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
               Features
             </Link>
@@ -51,27 +60,28 @@ export default function LandingPage() {
           </Badge>
 
           <h1 className="text-5xl md:text-7xl font-bold text-balance mb-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            Moca Pulse
+            Early Tester Marketplace
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground mb-4 text-balance">
-            Verifiable Feedback & Reputation
+            Vetted Testers • Fast Feedback • On-Chain Reputation
           </p>
 
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto text-pretty">
-            Generate your ID, join polls, and build constructive reputation on-chain. The future of decentralized
-            feedback is here.
+            Connect enterprises with verified early testers. Build reputation through quality feedback and fast turnaround times. All verified on-chain.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button asChild size="lg" className="text-lg px-8 py-6">
-              <Link href="/profile">
-                Get Started
+              <Link href="/browse">
+                Browse Projects
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6 bg-transparent">
-              View Demo
+            <Button variant="outline" size="lg" className="text-lg px-8 py-6 bg-transparent" asChild>
+              <Link href="/profile">
+                Create Profile
+              </Link>
             </Button>
           </div>
         </div>
@@ -97,20 +107,20 @@ export default function LandingPage() {
             {[
               {
                 icon: Shield,
-                title: "Step 1 – Generate ID",
-                description: "Create your unique decentralized identity with cryptographic verification",
+                title: "Step 1 – Create Tester Profile",
+                description: "Generate your verified identity and showcase testing credentials",
                 delay: "delay-300",
               },
               {
                 icon: Users,
-                title: "Step 2 – Join Polls",
-                description: "Participate in community polls and surveys with transparent voting",
+                title: "Step 2 – Join Testing Requests",
+                description: "Participate in enterprise testing surveys and feedback sessions",
                 delay: "delay-500",
               },
               {
                 icon: TrendingUp,
-                title: "Step 3 – Build Reputation",
-                description: "Earn reputation points through constructive participation and feedback",
+                title: "Step 3 – Build Tester Reputation",
+                description: "Earn reputation through quality feedback and fast turnaround times",
                 delay: "delay-700",
               },
             ].map((step, index) => (
@@ -151,20 +161,20 @@ export default function LandingPage() {
             {[
               {
                 icon: Shield,
-                title: "Unique ID & Reputation",
-                description: "Cryptographically secure identity with verifiable reputation scoring",
+                title: "Verified Tester Profiles",
+                description: "Cryptographically secure identities with testing speed & quality metrics",
                 delay: "delay-500",
               },
               {
                 icon: Users,
-                title: "Poll Creation & Participation",
-                description: "Create and participate in polls with transparent, tamper-proof results",
+                title: "Enterprise Testing Requests",
+                description: "Companies post testing needs, vetted testers provide quality feedback",
                 delay: "delay-700",
               },
               {
                 icon: Zap,
-                title: "On-chain Transparency",
-                description: "All interactions recorded on blockchain for complete transparency",
+                title: "Fast Turnaround Tracking",
+                description: "Real-time tracking of feedback speed and quality, all on-chain",
                 delay: "delay-900",
               },
             ].map((feature, index) => (
@@ -185,6 +195,53 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Enterprise Section */}
+      <section className="py-20 px-4 bg-muted/30">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-balance">For Enterprises & Product Teams</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
+              Access a vetted pool of early testers with proven track records. Get quality feedback fast.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <Card className="p-6 text-center border-2 hover:border-primary/50 transition-all">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Users className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Vetted Testers</h3>
+              <p className="text-muted-foreground text-pretty">Access testers with verified reputation scores, specializations, and proven turnaround times.</p>
+            </Card>
+
+            <Card className="p-6 text-center border-2 hover:border-primary/50 transition-all">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500/20 to-green-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Zap className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Fast Results</h3>
+              <p className="text-muted-foreground text-pretty">Get feedback in hours, not weeks. Choose testers based on their response time credentials.</p>
+            </Card>
+
+            <Card className="p-6 text-center border-2 hover:border-primary/50 transition-all">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Shield className="w-8 h-8 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">On-Chain Verified</h3>
+              <p className="text-muted-foreground text-pretty">All tester credentials and feedback quality scores are verified and stored on the blockchain.</p>
+            </Card>
+          </div>
+
+          <div className="text-center">
+            <Button asChild size="lg" className="text-lg px-8 py-6">
+              <Link href="/create-project">
+                Post Your Testing Project
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section
         ref={ctaReveal.ref}
@@ -193,16 +250,23 @@ export default function LandingPage() {
         }`}
       >
         <div className="container mx-auto text-center max-w-3xl">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-balance">Ready to Build Your Reputation?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-balance">Ready to Join the Marketplace?</h2>
           <p className="text-lg text-muted-foreground mb-8 text-pretty">
-            Join the future of decentralized feedback and start building your verifiable reputation today.
+            Whether you're an enterprise seeking quality testers or a tester looking to build reputation, start here.
           </p>
-          <Button asChild size="lg" className="text-lg px-8 py-6">
-            <Link href="/profile">
-              Get Started Now
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button asChild size="lg" className="text-lg px-8 py-6">
+              <Link href="/browse">
+                Browse Projects
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+            </Button>
+            <Button variant="outline" size="lg" className="text-lg px-8 py-6" asChild>
+              <Link href="/profile">
+                Create Profile
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -211,9 +275,9 @@ export default function LandingPage() {
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-6 h-6 bg-gradient-to-br from-primary to-accent rounded-md flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-xs">MP</span>
+              <span className="text-primary-foreground font-bold text-xs">ME</span>
             </div>
-            <span className="text-lg font-semibold">Moca Pulse</span>
+            <span className="text-lg font-semibold">Early Tester Marketplace</span>
           </div>
           <p className="text-muted-foreground mb-4">Built for Moca Network Buildathon</p>
           <div className="flex items-center justify-center space-x-1 text-sm text-muted-foreground">

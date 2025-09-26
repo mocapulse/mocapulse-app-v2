@@ -52,6 +52,11 @@ interface UserProfile {
   joinDate: string
   totalPolls: number
   totalVotes: number
+  avgFeedbackTime: number // hours
+  qualityScore: number // 0-100
+  specializations: string[]
+  completedTests: number
+  totalEarnings: number
 }
 
 export default function ReputationPage() {
@@ -66,7 +71,7 @@ export default function ReputationPage() {
 
   useEffect(() => {
     // Load user profile
-    const savedProfile = localStorage.getItem("mocaPulseProfile")
+    const savedProfile = localStorage.getItem("mocaEdgeProfile")
     if (savedProfile) {
       const profile = JSON.parse(savedProfile)
       setUserProfile({
@@ -77,6 +82,11 @@ export default function ReputationPage() {
         joinDate: profile.joinDate,
         totalPolls: 3,
         totalVotes: 12,
+        avgFeedbackTime: 4.2,
+        qualityScore: 87,
+        specializations: ["Mobile Apps", "Web3 DApps", "UX/UI"],
+        completedTests: 24,
+        totalEarnings: 1250,
       })
     }
 
@@ -218,7 +228,7 @@ export default function ReputationPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `moca-pulse-credentials-${userProfile.username}.json`
+    a.download = `moca-edge-credentials-${userProfile.username}.json`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -265,7 +275,7 @@ export default function ReputationPage() {
             </Button>
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">MP</span>
+                <span className="text-primary-foreground font-bold text-sm">ME</span>
               </div>
               <span className="text-xl font-bold text-foreground">Reputation</span>
             </div>
@@ -333,18 +343,38 @@ export default function ReputationPage() {
                     {levelInfo.nextThreshold - userProfile.reputation} points to next level
                   </p>
                 </div>
-                <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
                   <div>
-                    <div className="text-2xl font-bold text-blue-500">{userProfile.totalPolls}</div>
-                    <div className="text-sm text-muted-foreground">Polls Created</div>
+                    <div className="text-2xl font-bold text-blue-500">{userProfile.completedTests}</div>
+                    <div className="text-sm text-muted-foreground">Tests Completed</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-green-500">{userProfile.totalVotes}</div>
-                    <div className="text-sm text-muted-foreground">Polls Answered</div>
+                    <div className="text-2xl font-bold text-green-500">{userProfile.avgFeedbackTime}h</div>
+                    <div className="text-sm text-muted-foreground">Avg Turnaround</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-purple-500">{badges.length}</div>
+                    <div className="text-2xl font-bold text-purple-500">{userProfile.qualityScore}%</div>
+                    <div className="text-sm text-muted-foreground">Quality Score</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-orange-500">${userProfile.totalEarnings}</div>
+                    <div className="text-sm text-muted-foreground">Total Earned</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-pink-500">{badges.length}</div>
                     <div className="text-sm text-muted-foreground">Badges Earned</div>
+                  </div>
+                </div>
+
+                {/* Specializations */}
+                <div className="mt-4 pt-4 border-t">
+                  <h4 className="text-sm font-medium text-muted-foreground mb-2">SPECIALIZATIONS</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {userProfile.specializations.map((spec, index) => (
+                      <UIBadge key={index} variant="secondary">
+                        {spec}
+                      </UIBadge>
+                    ))}
                   </div>
                 </div>
               </div>

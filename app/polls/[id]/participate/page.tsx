@@ -72,7 +72,7 @@ export default function PollParticipationPage({ params }: { params: { id: string
   useEffect(() => {
     // Load user profile - prioritize AIR Kit user data
     if (isAuthenticated && user) {
-      const savedProfile = localStorage.getItem("mocaPulseProfile")
+      const savedProfile = localStorage.getItem("mocaEdgeProfile")
       let profile: UserProfile
 
       if (savedProfile) {
@@ -87,7 +87,7 @@ export default function PollParticipationPage({ params }: { params: { id: string
       setUserProfile(profile)
     } else {
       // Fallback to localStorage only
-      const savedProfile = localStorage.getItem("mocaPulseProfile")
+      const savedProfile = localStorage.getItem("mocaEdgeProfile")
       if (savedProfile) {
         setUserProfile(JSON.parse(savedProfile))
       }
@@ -161,7 +161,7 @@ export default function PollParticipationPage({ params }: { params: { id: string
         reputation: userProfile.reputation + poll.reputationReward,
       }
       setUserProfile(updatedProfile)
-      localStorage.setItem("mocaPulseProfile", JSON.stringify(updatedProfile))
+      localStorage.setItem("mocaEdgeProfile", JSON.stringify(updatedProfile))
 
       // Issue reputation credential if significant milestone
       if (updatedProfile.reputation % 100 === 0 || updatedProfile.reputation >= 500) {
@@ -218,9 +218,9 @@ export default function PollParticipationPage({ params }: { params: { id: string
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/dashboard" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">MP</span>
+                <span className="text-primary-foreground font-bold text-sm">ME</span>
               </div>
-              <span className="text-xl font-bold text-foreground">Moca Pulse</span>
+              <span className="text-xl font-bold text-foreground">Moca Edge</span>
             </Link>
           </div>
         </header>
@@ -282,9 +282,9 @@ export default function PollParticipationPage({ params }: { params: { id: string
             </Button>
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">MP</span>
+                <span className="text-primary-foreground font-bold text-sm">ME</span>
               </div>
-              <span className="text-xl font-bold text-foreground">Moca Pulse</span>
+              <span className="text-xl font-bold text-foreground">Moca Edge</span>
             </div>
           </div>
           <div className="flex items-center space-x-4">
