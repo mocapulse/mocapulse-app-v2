@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ConnectButton } from "@/components/connect-button"
-import { ArrowRight, Shield, Users, Zap, CheckCircle, Globe, TrendingUp } from "lucide-react"
+import { ArrowRight, Shield, Users, Zap, CheckCircle, Globe, TrendingUp, Menu, X } from "lucide-react"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { useState } from "react"
 
 export default function LandingPage() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const heroReveal = useScrollReveal()
   const howItWorksReveal = useScrollReveal()
   const featuresReveal = useScrollReveal()
@@ -25,6 +27,8 @@ export default function LandingPage() {
             </div>
             <span className="text-xl font-bold text-foreground">Moca Edge</span>
           </div>
+
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             <Link href="/browse" className="text-muted-foreground hover:text-foreground transition-colors">
               Browse Projects
@@ -43,7 +47,66 @@ export default function LandingPage() {
             </Link>
             <ConnectButton />
           </nav>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle mobile menu"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
+          </button>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-border/50 bg-background/95 backdrop-blur-sm">
+            <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4">
+              <Link
+                href="/browse"
+                className="text-muted-foreground hover:text-foreground transition-colors py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Browse Projects
+              </Link>
+              <Link
+                href="/create-project"
+                className="text-muted-foreground hover:text-foreground transition-colors py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Post Project
+              </Link>
+              <Link
+                href="/assessments"
+                className="text-muted-foreground hover:text-foreground transition-colors py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Assessments
+              </Link>
+              <Link
+                href="#features"
+                className="text-muted-foreground hover:text-foreground transition-colors py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Features
+              </Link>
+              <Link
+                href="#how-it-works"
+                className="text-muted-foreground hover:text-foreground transition-colors py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                How It Works
+              </Link>
+              <div className="pt-2">
+                <ConnectButton />
+              </div>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
