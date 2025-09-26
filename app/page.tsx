@@ -32,6 +32,9 @@ export default function LandingPage() {
             <Link href="/create-project" className="text-muted-foreground hover:text-foreground transition-colors">
               Post Project
             </Link>
+            <Link href="/assessments" className="text-muted-foreground hover:text-foreground transition-colors">
+              Assessments
+            </Link>
             <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
               Features
             </Link>
