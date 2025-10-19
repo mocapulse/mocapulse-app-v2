@@ -42,6 +42,7 @@ import {
 import { VerificationBadgeList, VerificationStatus } from "@/components/verification-badge"
 import { VerificationMethodSelector, type VerificationMethod } from "@/components/verification-method-selector"
 import { DocumentUpload } from "@/components/document-upload"
+import { ConnectButton } from "@/components/connect-button"
 
 type VerificationStep = {
   id: SocialPlatform | 'age';
@@ -254,12 +255,38 @@ export default function VerifyPage() {
   if (!isAuthenticated || !user) {
     return (
       <div className="container max-w-4xl py-8">
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Please connect your wallet to access verification features.
-          </AlertDescription>
-        </Alert>
+        <div className="mb-6">
+          <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Link>
+
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold">Account Verification</h1>
+            <p className="text-muted-foreground">
+              Verify your identity and connect social accounts to increase your reputation score.
+            </p>
+          </div>
+        </div>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center text-center space-y-4 py-8">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                <AlertCircle className="h-8 w-8 text-primary" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold">Connect Your Wallet</h3>
+                <p className="text-sm text-muted-foreground max-w-md">
+                  Please connect your MOCA wallet to access verification features and start building your reputation.
+                </p>
+              </div>
+              <div className="pt-4">
+                <ConnectButton />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
