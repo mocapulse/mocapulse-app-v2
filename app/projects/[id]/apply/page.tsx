@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -26,6 +26,8 @@ import {
   Zap
 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useAirKit } from "@/contexts/airkit-context"
+import { hasAgeVerification } from "@/lib/credentials"
 
 // Mock project data - in real app this would come from API
 const mockProject = {
@@ -96,7 +98,10 @@ const mockUserProfile = {
 type ApplicationStep = "requirements" | "application" | "testing" | "submitted"
 
 export default function ProjectApplicationPage({ params }: { params: { id: string } }) {
+  const { user } = useAirKit()
   const [currentStep, setCurrentStep] = useState<ApplicationStep>("requirements")
+  const [ageVerified, setAgeVerified] = useState(false)
+  const [checkingAge, setCheckingAge] = useState(true)
   const [applicationData, setApplicationData] = useState({
     motivation: "",
     relevantExperience: "",
@@ -107,8 +112,30 @@ export default function ProjectApplicationPage({ params }: { params: { id: strin
   const [completedTasks, setCompletedTasks] = useState<number[]>([])
   const [taskFeedback, setTaskFeedback] = useState<Record<number, { rating: number; feedback: string; screenshots?: File[] }>>({})
 
+  // Check age verification status
+  useEffect(() => {
+    const checkAge = async () => {
+      if (!user?.id) {
+        setCheckingAge(false)
+        return
+      }
+
+      try {
+        const hasAge = await hasAgeVerification(user.id)
+        setAgeVerified(hasAge)
+      } catch (error) {
+        console.error('Failed to check age verification:', error)
+      } finally {
+        setCheckingAge(false)
+      }
+    }
+
+    checkAge()
+  }, [user])
+
   const checkRequirements = () => {
     const meets = {
+      ageVerification: ageVerified, // NEW: Age verification requirement
       reputation: mockUserProfile.reputation >= mockProject.requirements.minReputation,
       specializations: mockProject.requirements.specializations.some(spec =>
         mockUserProfile.specializations.includes(spec)
@@ -157,6 +184,42 @@ export default function ProjectApplicationPage({ params }: { params: { id: strin
       <CardContent className="space-y-4">
         {/* Requirement checks */}
         <div className="grid gap-4">
+          {/* Age Verification - NEW */}
+          <div className={`flex items-center justify-between p-3 rounded-lg border ${
+            requirements.meets.ageVerification ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950' : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950'
+          }`}>
+            <div className="flex items-center gap-3">
+              {requirements.meets.ageVerification ? (
+                <CheckCircle className="w-5 h-5 text-green-500" />
+              ) : (
+                <XCircle className="w-5 h-5 text-red-500" />
+              )}
+              <div>
+                <p className="font-medium flex items-center gap-2">
+                  <Shield className="w-4 h-4" />
+                  Age Verification (18+)
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {requirements.meets.ageVerification
+                    ? "Age verified using zero-knowledge proof"
+                    : "You must verify you are 18+ to apply"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant={requirements.meets.ageVerification ? "secondary" : "destructive"}>
+                {requirements.meets.ageVerification ? "✓ Verified" : "✗ Required"}
+              </Badge>
+              {!requirements.meets.ageVerification && (
+                <Link href="/verify">
+                  <Button size="sm" variant="outline">
+                    Verify Now
+                  </Button>
+                </Link>
+              )}
+            </div>
+          </div>
+
           <div className="flex items-center justify-between p-3 rounded-lg border">
             <div className="flex items-center gap-3">
               {requirements.meets.reputation ? (
