@@ -21,9 +21,16 @@ import {
   Vote,
   CheckCircle,
   ExternalLink,
+  AlertCircle,
+  Shield,
 } from "lucide-react"
 import Link from "next/link"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { useAirKit } from "@/contexts/airkit-context"
+import { hasAgeVerification, getSocialVerifications } from "@/lib/credentials"
+import { calculateOverallReputation } from "@/lib/social-verification"
+import { ConnectButton } from "@/components/connect-button"
+import { VerificationBadge } from "@/components/verification-badge"
 
 interface ReputationActivity {
   id: string
@@ -60,121 +67,135 @@ interface UserProfile {
 }
 
 export default function ReputationPage() {
+  const { user, isAuthenticated, isLoading: authLoading } = useAirKit()
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [activities, setActivities] = useState<ReputationActivity[]>([])
   const [badges, setBadges] = useState<UserBadge[]>([])
   const [reputationHistory, setReputationHistory] = useState<Array<{ date: string; reputation: number }>>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [ageVerified, setAgeVerified] = useState(false)
 
   const headerReveal = useScrollReveal()
   const statsReveal = useScrollReveal()
   const contentReveal = useScrollReveal()
 
   useEffect(() => {
-    // Load user profile
-    const savedProfile = localStorage.getItem("mocaEdgeProfile")
-    if (savedProfile) {
-      const profile = JSON.parse(savedProfile)
-      setUserProfile({
-        id: profile.id,
-        username: profile.username,
-        reputation: profile.reputation,
-        level: getReputationLevel(profile.reputation).level,
-        joinDate: profile.joinDate,
-        totalPolls: 3,
-        totalVotes: 12,
-        avgFeedbackTime: 4.2,
-        qualityScore: 87,
-        specializations: ["Mobile Apps", "Web3 DApps", "UX/UI"],
-        completedTests: 24,
-        totalEarnings: 1250,
-      })
+    const loadUserData = async () => {
+      if (!user || !isAuthenticated) {
+        setIsLoading(false)
+        return
+      }
+
+      try {
+        setIsLoading(true)
+
+        // Check age verification
+        const hasAge = await hasAgeVerification(user.id)
+        setAgeVerified(hasAge)
+
+        // Get social verifications
+        const socialVerifs = await getSocialVerifications(user.id)
+
+        // Calculate reputation from verification quality scores
+        const verificationResults = socialVerifs.map(sv => sv.verificationData)
+        const overallScore = calculateOverallReputation(verificationResults)
+        const reputation = Math.round(overallScore * 10) // Scale to 0-1000 range
+
+        // Build user profile from real data
+        setUserProfile({
+          id: user.id,
+          username: user.username || user.email?.split('@')[0] || 'Anonymous',
+          reputation,
+          level: getReputationLevel(reputation).level,
+          joinDate: user.createdAt || new Date().toISOString().split('T')[0],
+          totalPolls: 0, // TODO: Integrate with actual poll system
+          totalVotes: 0, // TODO: Integrate with actual poll system
+          avgFeedbackTime: 0,
+          qualityScore: Math.round(overallScore),
+          specializations: socialVerifs.map(sv => sv.platform),
+          completedTests: socialVerifs.length,
+          totalEarnings: 0, // TODO: Integrate with payment system
+        })
+
+        // Build activities from verifications
+        const newActivities: ReputationActivity[] = socialVerifs.map((sv, index) => ({
+          id: `verification-${index}`,
+          type: "badge_earned",
+          title: `Verified ${sv.platform} Account`,
+          description: `${sv.username} verified with quality score ${sv.qualityScore}/100`,
+          points: Math.round(sv.qualityScore / 10),
+          date: new Date(sv.verifiedAt).toISOString().split('T')[0],
+        }))
+
+        if (hasAge) {
+          newActivities.unshift({
+            id: "age-verification",
+            type: "badge_earned",
+            title: "Age Verified (18+)",
+            description: "Verified age using zero-knowledge proof",
+            points: 50,
+            date: new Date().toISOString().split('T')[0],
+          })
+        }
+
+        setActivities(newActivities)
+
+        // Build badges from verifications
+        const newBadges: UserBadge[] = []
+
+        if (hasAge) {
+          newBadges.push({
+            id: "age-verified",
+            name: "Age Verified",
+            description: "Verified 18+ using zero-knowledge proof",
+            icon: "🛡️",
+            rarity: "rare",
+            earnedAt: new Date().toISOString().split('T')[0],
+          })
+        }
+
+        socialVerifs.forEach((sv, index) => {
+          const rarity: "common" | "rare" | "epic" | "legendary" =
+            sv.qualityScore >= 90 ? "legendary" :
+            sv.qualityScore >= 75 ? "epic" :
+            sv.qualityScore >= 50 ? "rare" : "common"
+
+          newBadges.push({
+            id: `social-${index}`,
+            name: `${sv.platform} Verified`,
+            description: `Quality score: ${sv.qualityScore}/100`,
+            icon: sv.platform === "GitHub" ? "💻" :
+                  sv.platform === "Lens" ? "🌿" :
+                  sv.platform === "Farcaster" ? "🟣" :
+                  sv.platform === "Twitter" ? "🐦" : "✅",
+            rarity,
+            earnedAt: new Date(sv.verifiedAt).toISOString().split('T')[0],
+          })
+        })
+
+        setBadges(newBadges)
+
+        // Build reputation history (simplified for now)
+        const now = Date.now()
+        const history = Array.from({ length: 6 }, (_, i) => {
+          const date = new Date(now - (5 - i) * 24 * 60 * 60 * 1000)
+          const progress = (i + 1) / 6
+          return {
+            date: date.toISOString().split('T')[0],
+            reputation: Math.round(reputation * progress)
+          }
+        })
+        setReputationHistory(history)
+
+      } catch (error) {
+        console.error('Failed to load user data:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
 
-    // Mock reputation activities
-    setActivities([
-      {
-        id: "1",
-        type: "poll_answered",
-        title: "Answered NFT Marketplace Preferences",
-        description: "Provided valuable feedback on marketplace features",
-        points: 10,
-        date: "2024-01-15",
-        pollId: "poll_3",
-      },
-      {
-        id: "2",
-        type: "poll_created",
-        title: "Created Web3 Development Framework Poll",
-        description: "Poll received 24 responses from the community",
-        points: 15,
-        date: "2024-01-12",
-        pollId: "poll_1",
-      },
-      {
-        id: "3",
-        type: "helpful_vote",
-        title: "Received Helpful Vote",
-        description: "Your response was marked as helpful by other users",
-        points: 5,
-        date: "2024-01-10",
-      },
-      {
-        id: "4",
-        type: "badge_earned",
-        title: "Earned Active Contributor Badge",
-        description: "Participated in 10+ polls this month",
-        points: 25,
-        date: "2024-01-08",
-      },
-      {
-        id: "5",
-        type: "poll_answered",
-        title: "Answered Blockchain Scalability Solutions",
-        description: "Shared insights on Layer 2 scaling solutions",
-        points: 10,
-        date: "2024-01-05",
-        pollId: "poll_4",
-      },
-    ])
-
-    // Mock badges
-    setBadges([
-      {
-        id: "1",
-        name: "Active Contributor",
-        description: "Participated in 10+ polls",
-        icon: "🏆",
-        rarity: "rare",
-        earnedAt: "2024-01-08",
-      },
-      {
-        id: "2",
-        name: "Poll Creator",
-        description: "Created your first poll",
-        icon: "🎯",
-        rarity: "common",
-        earnedAt: "2024-01-12",
-      },
-      {
-        id: "3",
-        name: "Community Helper",
-        description: "Received 5+ helpful votes",
-        icon: "🤝",
-        rarity: "common",
-        earnedAt: "2024-01-10",
-      },
-    ])
-
-    // Mock reputation history
-    setReputationHistory([
-      { date: "2024-01-01", reputation: 100 },
-      { date: "2024-01-05", reputation: 110 },
-      { date: "2024-01-08", reputation: 135 },
-      { date: "2024-01-10", reputation: 140 },
-      { date: "2024-01-12", reputation: 155 },
-      { date: "2024-01-15", reputation: 165 },
-    ])
-  }, [])
+    loadUserData()
+  }, [user, isAuthenticated])
 
   const getReputationLevel = (reputation: number) => {
     if (reputation >= 1000) return { level: "Expert", color: "text-yellow-500", next: "Master", nextThreshold: 2000 }
@@ -235,17 +256,83 @@ export default function ReputationPage() {
     URL.revokeObjectURL(url)
   }
 
-  if (!userProfile) {
+  // Loading state
+  if (authLoading || isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center">
         <Card className="p-8 text-center">
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+              <p className="text-muted-foreground">Loading your reputation data...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // Unauthenticated state
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center">
+        <Card className="p-8 text-center max-w-md">
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center text-center space-y-4 py-8">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                <AlertCircle className="h-8 w-8 text-primary" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold">Connect Your Wallet</h3>
+                <p className="text-sm text-muted-foreground">
+                  Please connect your MOCA wallet to view your reputation and credentials.
+                </p>
+              </div>
+              <div className="pt-4">
+                <ConnectButton />
+              </div>
+              <div className="pt-4 border-t w-full">
+                <p className="text-xs text-muted-foreground">
+                  Your reputation is based on verified credentials and social verifications stored on MOCA Network.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // No data yet state
+  if (!userProfile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center">
+        <Card className="p-8 text-center max-w-md">
           <CardHeader>
-            <CardTitle>Profile Required</CardTitle>
-            <CardDescription>Please create your profile first to view your reputation.</CardDescription>
+            <div className="flex flex-col items-center space-y-4 mb-4">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                <Shield className="h-8 w-8 text-primary" />
+              </div>
+              <CardTitle>Build Your Reputation</CardTitle>
+            </div>
+            <CardDescription>
+              Start building your reputation by verifying your identity and social accounts.
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Button asChild>
-              <Link href="/profile">Create Profile</Link>
+          <CardContent className="space-y-4">
+            <div className="text-left space-y-2 p-4 bg-muted/50 rounded-lg">
+              <p className="text-sm font-medium">Get started by:</p>
+              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                <li>Verifying your age (18+)</li>
+                <li>Connecting social accounts (GitHub, Lens, Farcaster, Twitter)</li>
+                <li>Participating in polls and testing programs</li>
+              </ul>
+            </div>
+            <Button asChild className="w-full">
+              <Link href="/verify">
+                <Shield className="w-4 h-4 mr-2" />
+                Start Verification
+              </Link>
             </Button>
           </CardContent>
         </Card>
