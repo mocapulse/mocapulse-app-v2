@@ -39,17 +39,35 @@ This system enables users to:
 
 ### 🛡️ Age Verification (18+)
 
-**Technology**: MOCA AIR Kit Zero-Knowledge Proofs
+**Technology**: MOCA AIR Kit Zero-Knowledge Proofs + Document Upload
 
-**How it works**:
+**Two Verification Methods**:
+
+**Method 1: Zero-Knowledge Proofs** (For users with existing credentials)
 - User proves they are 18+ without revealing actual birthdate
 - Uses cryptographic ZK proofs - mathematically verifiable, privacy-preserving
-- Credential is issued and stored on MOCA Network blockchain
-- Required to apply for testing projects
+- Credential is verified on MOCA Network blockchain
+- Instant verification (no document upload)
+
+**Method 2: Document Upload** (For first-time users)
+- User uploads government-issued ID (passport, driver's license, or national ID)
+- System extracts birthdate without storing document
+- Age credential is issued to AIR wallet
+- Document is immediately discarded (privacy-preserving)
+
+**How it works**:
+1. User chooses verification method
+2. If ZK Proof: Uses existing age credential from AIR wallet
+3. If Document: Uploads ID → Enters birthdate → System verifies age >= 18 → Credential issued
+4. Required to apply for testing projects
 
 **Files**:
-- `lib/credentials.ts` - `verifyAge()`, `hasAgeVerification()`
-- `app/verify/page.tsx` - Age verification UI
+- `lib/credentials.ts` - `verifyAge()`, `verifyAgeWithDocument()`, `hasAgeVerification()`
+- `lib/document-verification.ts` - Document processing and age calculation
+- `app/verify/page.tsx` - Age verification UI with two methods
+- `app/api/verify-age-document/route.ts` - Document upload API
+- `components/document-upload.tsx` - Document upload component
+- `components/verification-method-selector.tsx` - Method selection UI
 - `app/projects/[id]/apply/page.tsx` - Age check enforcement
 
 ### 🔗 Social Platform Verification
@@ -141,7 +159,109 @@ NEXT_PUBLIC_MOCA_VERIFIER_DID=did:moca:your_verifier_did
 - [AIR Kit Guide](https://moca.network/blog/what-is-air-kit/)
 - [ZK Proofs Explained](https://moca.network/blog/what-is-zero-knowledge-proof/)
 
-### 3. Social Platform API Keys
+### 3. Get Age Verification Program ID
+
+**CRITICAL**: Required for ZK Proof age verification to work.
+
+#### Option A: MOCA Network Partner Dashboard
+
+1. **Login** to MOCA Network Partner Dashboard
+   - URL: https://partner.moca.network (or equivalent)
+   - Use your partner account credentials
+
+2. **Navigate to Credential Programs**
+   - Look for "Credential Programs", "Verification Programs", or "AIR Programs" section
+   - Click "Create New Program" or "Add Program"
+
+3. **Create Age Verification Program**
+   ```
+   Program Name: Age Verification (18+)
+   Program Type: Age Verification
+   Verification Method: Zero-Knowledge Proof
+   Minimum Age: 18
+   Credential Schema: Standard Age Credential
+   Privacy Level: Maximum (ZK Proofs)
+   ```
+
+4. **Copy Program ID**
+   - After creation, you'll receive a `programId` (e.g., `age-verify-18-prod`)
+   - This is typically in format: `[purpose]-[requirement]-[environment]`
+
+5. **Add to .env.local**:
+   ```env
+   NEXT_PUBLIC_MOCA_AGE_VERIFICATION_PROGRAM_ID=age-verify-18-prod
+   ```
+
+#### Option B: Contact MOCA Support
+
+If you can't find the dashboard option or need assistance:
+
+1. **Email MOCA Developer Support**
+   - Email: developers@moca.network or support@moca.network
+   - Subject: "Request Age Verification Program ID"
+
+2. **Include in Your Request**:
+   ```
+   Partner ID: [YOUR_PARTNER_ID]
+   Purpose: Age verification (18+) for testing platform
+   Required verification: Zero-knowledge proof
+   Environment: Sandbox (for development) or Production
+   ```
+
+3. **Expected Response**:
+   - They will provide your `programId`
+   - May include additional configuration instructions
+   - Typical response time: 1-2 business days
+
+#### Option C: Use Developer Documentation
+
+1. **Check MOCA Docs** for programId setup:
+   - Visit: https://docs.moca.network
+   - Look for: "AIR Kit" → "Credential Programs" → "Age Verification"
+   - Follow the setup wizard
+
+2. **Alternative Docs Paths**:
+   - https://docs.moca.network/air-kit/credentials
+   - https://docs.moca.network/developers/programs
+   - Check `/llms.txt` or `/llms-full.txt` for detailed guides
+
+#### Troubleshooting Program ID Issues
+
+**Error: "Program ID not configured"**
+- Check `.env.local` has `NEXT_PUBLIC_MOCA_AGE_VERIFICATION_PROGRAM_ID`
+- Restart development server after adding environment variable
+- Ensure no typos in the programId
+
+**Error: "Invalid program ID"**
+- Verify programId matches exactly (case-sensitive)
+- Check you're using the correct environment (sandbox vs production)
+- Confirm programId is active in partner dashboard
+
+**Error: "Program not found"**
+- Your partner account may not have access to this program
+- Contact MOCA support to enable age verification for your account
+- Verify your partner ID is correct
+
+### 4. Document Upload Configuration (Optional)
+
+For document-based age verification (first-time users):
+
+```env
+# Document Upload Settings
+MAX_DOCUMENT_SIZE_MB=5
+ALLOWED_DOCUMENT_TYPES=jpg,jpeg,png,pdf
+RATE_LIMIT_ATTEMPTS_PER_DAY=3
+```
+
+**Privacy Notice**: Documents are:
+- Processed in memory only (never written to disk)
+- Deleted immediately after birthdate extraction
+- Never logged or stored anywhere
+- Only age verification (18+ yes/no) is recorded
+
+**Rate Limiting**: Prevents abuse by limiting verification attempts to 3 per day per user.
+
+### 5. Social Platform API Keys
 
 #### GitHub (Optional for basic use, required for OAuth)
 

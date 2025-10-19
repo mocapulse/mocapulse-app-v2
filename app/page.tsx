@@ -39,6 +39,10 @@ export default function LandingPage() {
             <Link href="/assessments" className="text-muted-foreground hover:text-foreground transition-colors">
               Assessments
             </Link>
+            <Link href="/verify" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5">
+              <Shield className="w-4 h-4" />
+              Verify Account
+            </Link>
             <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
               Features
             </Link>
@@ -86,6 +90,14 @@ export default function LandingPage() {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Assessments
+              </Link>
+              <Link
+                href="/verify"
+                className="text-muted-foreground hover:text-foreground transition-colors py-2 flex items-center gap-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Shield className="w-4 h-4" />
+                Verify Account
               </Link>
               <Link
                 href="#features"

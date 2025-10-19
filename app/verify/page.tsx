@@ -40,6 +40,8 @@ import {
   type VerificationResult
 } from "@/lib/social-verification"
 import { VerificationBadgeList, VerificationStatus } from "@/components/verification-badge"
+import { VerificationMethodSelector, type VerificationMethod } from "@/components/verification-method-selector"
+import { DocumentUpload } from "@/components/document-upload"
 
 type VerificationStep = {
   id: SocialPlatform | 'age';
@@ -68,6 +70,9 @@ export default function VerifyPage() {
   // Loading states
   const [verifyingAge, setVerifyingAge] = useState(false)
   const [verifyingPlatform, setVerifyingPlatform] = useState<string | null>(null)
+
+  // Age verification method selection
+  const [ageVerificationMethod, setAgeVerificationMethod] = useState<VerificationMethod>(null)
 
   // Alert state
   const [alert, setAlert] = useState<{ type: 'success' | 'error', message: string } | null>(null)
@@ -119,15 +124,23 @@ export default function VerifyPage() {
 
       if (verified) {
         setAgeVerified(true)
+        setAgeVerificationMethod(null)
         setAlert({ type: 'success', message: 'Age verified successfully! You can now apply to projects.' })
       } else {
         setAlert({ type: 'error', message: 'Age verification failed or was cancelled' })
       }
     } catch (error) {
-      setAlert({ type: 'error', message: 'Failed to verify age. Please try again.' })
+      const errorMessage = error instanceof Error ? error.message : 'Failed to verify age. Please try again.'
+      setAlert({ type: 'error', message: errorMessage })
     } finally {
       setVerifyingAge(false)
     }
+  }
+
+  const handleDocumentUploadSuccess = (result: any) => {
+    setAgeVerified(true)
+    setAgeVerificationMethod(null)
+    setAlert({ type: 'success', message: 'Age verified successfully! You can now apply to projects.' })
   }
 
   const handlePlatformVerification = async (
@@ -316,61 +329,118 @@ export default function VerifyPage() {
       </Card>
 
       {/* Age Verification */}
-      <Card className={`mb-6 ${ageVerified ? 'border-green-500' : ''}`}>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Shield className="h-6 w-6 text-green-600" />
-              <div>
-                <CardTitle>Age Verification (Required)</CardTitle>
-                <CardDescription>
-                  Verify you are 18+ using zero-knowledge proofs (your actual age remains private)
-                </CardDescription>
+      <div className="mb-6">
+        {ageVerified ? (
+          <Card className="border-green-500">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Shield className="h-6 w-6 text-green-600" />
+                  <div>
+                    <CardTitle>Age Verification (Required)</CardTitle>
+                    <CardDescription>
+                      Age verified successfully
+                    </CardDescription>
+                  </div>
+                </div>
+                <CheckCircle2 className="h-6 w-6 text-green-600" />
               </div>
-            </div>
-            {ageVerified && (
-              <CheckCircle2 className="h-6 w-6 text-green-600" />
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {ageVerified ? (
-            <Alert className="border-green-500">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <AlertDescription>
-                Age verified successfully. You can now apply to testing projects.
-              </AlertDescription>
-            </Alert>
-          ) : (
-            <div className="space-y-4">
-              <Alert>
-                <Shield className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <Alert className="border-green-500">
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
                 <AlertDescription>
-                  MOCA AIR Kit uses zero-knowledge proofs to verify your age without revealing your birthdate.
-                  Your privacy is fully protected.
+                  Age verified successfully. You can now apply to testing projects.
                 </AlertDescription>
               </Alert>
-              <Button
-                onClick={handleAgeVerification}
-                disabled={verifyingAge}
-                className="w-full"
-              >
-                {verifyingAge ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Verifying...
-                  </>
-                ) : (
-                  <>
-                    <Shield className="h-4 w-4 mr-2" />
-                    Verify Age (18+)
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            {!ageVerificationMethod ? (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <Shield className="h-6 w-6 text-primary" />
+                    <div>
+                      <CardTitle>Age Verification (Required)</CardTitle>
+                      <CardDescription>
+                        Choose how you'd like to verify your age (18+)
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <VerificationMethodSelector
+                    onSelectMethod={setAgeVerificationMethod}
+                    selectedMethod={ageVerificationMethod}
+                  />
+                </CardContent>
+              </Card>
+            ) : ageVerificationMethod === 'zkproof' ? (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Shield className="h-6 w-6 text-primary" />
+                      <div>
+                        <CardTitle>Zero-Knowledge Proof Verification</CardTitle>
+                        <CardDescription>
+                          Prove you're 18+ without revealing your birthdate
+                        </CardDescription>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => setAgeVerificationMethod(null)}>
+                      <ArrowLeft className="h-4 w-4 mr-2" />
+                      Back
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Alert>
+                    <Shield className="h-4 w-4" />
+                    <AlertDescription>
+                      MOCA AIR Kit uses zero-knowledge proofs to verify your age without revealing your birthdate.
+                      Your privacy is fully protected.
+                    </AlertDescription>
+                  </Alert>
+                  <Button
+                    onClick={handleAgeVerification}
+                    disabled={verifyingAge}
+                    className="w-full"
+                  >
+                    {verifyingAge ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Verifying...
+                      </>
+                    ) : (
+                      <>
+                        <Shield className="h-4 w-4 mr-2" />
+                        Verify Age with ZK Proof
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Button variant="ghost" size="sm" onClick={() => setAgeVerificationMethod(null)}>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back to Method Selection
+                  </Button>
+                </div>
+                <DocumentUpload
+                  userId={user?.id || ''}
+                  onSuccess={handleDocumentUploadSuccess}
+                  onCancel={() => setAgeVerificationMethod(null)}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
 
       {/* Tier 1 - Highest Priority */}
       <div className="mb-6">

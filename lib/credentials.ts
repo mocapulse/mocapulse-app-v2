@@ -150,47 +150,104 @@ export const getUserCredentials = async (userId: string) => {
 /**
  * Age Verification using MOCA AIR Kit's Zero-Knowledge Proofs
  * Verifies user is 18+ without revealing actual age or birthdate
+ *
+ * This requires:
+ * 1. User must have an age credential in their AIR wallet
+ * 2. NEXT_PUBLIC_MOCA_AGE_VERIFICATION_PROGRAM_ID must be configured
  */
 export const verifyAge = async (userId: string): Promise<boolean> => {
   try {
     const airService = await getAirService();
 
-    // Check if AIR Kit has age verification with ZK proofs
-    if (typeof (airService as any).verifyAge === 'function') {
-      // Request age verification - this should trigger AIR Kit's ZK proof flow
-      const result = await (airService as any).verifyAge({
-        minimumAge: 18,
-        userId
-      });
+    // Get program ID from environment
+    const programId = process.env.NEXT_PUBLIC_MOCA_AGE_VERIFICATION_PROGRAM_ID;
 
-      if (result.verified) {
-        // Issue age verification credential
-        const credentialData: AgeVerificationCredential = {
-          userId,
-          isOver18: true,
-          verifiedAt: new Date().toISOString(),
-          zkProof: result.proof || undefined
-        };
-
-        await issueCredential('age_verification', credentialData);
-        return true;
-      }
-
-      return false;
+    if (!programId) {
+      throw new Error(
+        'Age verification program ID not configured. Please add NEXT_PUBLIC_MOCA_AGE_VERIFICATION_PROGRAM_ID to your .env.local file. ' +
+        'See VERIFICATION_GUIDE.md for instructions on obtaining a program ID from MOCA Network.'
+      );
     }
 
-    // Fallback: For development, show a prompt
-    // In production, this should ALWAYS use AIR Kit's ZK proof system
-    console.warn('AIR Kit age verification not available - using fallback');
+    // Get auth token
+    const tokenResult = await airService.getAccessToken();
+    const authToken = tokenResult.token;
 
-    // Simulated age verification for development
-    const confirmed = window.confirm(
-      'Age Verification Required\n\n' +
-      'In production, this will use MOCA AIR Kit\'s zero-knowledge proofs to verify you are 18+ without revealing your actual age.\n\n' +
-      'For development purposes: Are you 18 years or older?'
+    // Call verifyCredential with age verification program
+    const result = await airService.verifyCredential({
+      authToken,
+      programId,
+      redirectUrl: window.location.href, // Return to current page after verification
+    });
+
+    // Check if verification succeeded
+    if (result.verified) {
+      // Issue our own credential recording the verification
+      const credentialData: AgeVerificationCredential = {
+        userId,
+        isOver18: true,
+        verifiedAt: new Date().toISOString(),
+        zkProof: result.proof || undefined
+      };
+
+      await issueCredential('age_verification', credentialData);
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error('Age verification failed:', error);
+
+    // Provide helpful error messages
+    if (error instanceof Error) {
+      if (error.message.includes('program ID not configured')) {
+        throw error; // Re-throw configuration errors
+      }
+      if (error.message.includes('not found')) {
+        throw new Error(
+          'No age credential found in your AIR wallet. Please use document upload to create one first.'
+        );
+      }
+    }
+
+    throw new Error(
+      'Age verification failed. You may not have an age credential yet. Try uploading a government ID instead.'
     );
+  }
+};
 
-    if (confirmed) {
+/**
+ * Age Verification via Document Upload
+ * For first-time users who don't have an age credential yet
+ */
+export const verifyAgeWithDocument = async (
+  userId: string,
+  documentFile: File,
+  birthdate: string,
+  documentType: 'passport' | 'drivers_license' | 'national_id'
+): Promise<boolean> => {
+  try {
+    // Prepare form data
+    const formData = new FormData();
+    formData.append('userId', userId);
+    formData.append('birthdate', birthdate);
+    formData.append('documentType', documentType);
+    formData.append('document', documentFile);
+
+    // Submit to API
+    const response = await fetch('/api/verify-age-document', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || result.message || 'Verification failed');
+    }
+
+    if (result.isOver18) {
+      // Store local reference
       const credentialData: AgeVerificationCredential = {
         userId,
         isOver18: true,
@@ -201,10 +258,10 @@ export const verifyAge = async (userId: string): Promise<boolean> => {
       return true;
     }
 
-    return false;
+    throw new Error(result.error || 'Age verification failed');
   } catch (error) {
-    console.error('Age verification failed:', error);
-    return false;
+    console.error('Document verification failed:', error);
+    throw error;
   }
 };
 
