@@ -31,7 +31,10 @@ export function SiteHeader() {
           </Link>
           <Link href="/verify" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5">
             <Shield className="w-4 h-4" />
-            Verify Account
+            Verify
+          </Link>
+          <Link href="/issue-credential" className="text-muted-foreground hover:text-foreground transition-colors">
+            Issue Credentials
           </Link>
           <Link href="/#features" className="text-muted-foreground hover:text-foreground transition-colors">
             Features
@@ -87,7 +90,14 @@ export function SiteHeader() {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <Shield className="w-4 h-4" />
-              Verify Account
+              Verify
+            </Link>
+            <Link
+              href="/issue-credential"
+              className="text-muted-foreground hover:text-foreground transition-colors py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Issue Credentials
             </Link>
             <Link
               href="/#features"

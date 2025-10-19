@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
-import { ConnectButton } from "@/components/connect-button"
+import { SiteHeader } from "@/components/site-header"
 import { useAirKit } from "@/contexts/airkit-context"
 import {
   Search,
@@ -379,29 +379,7 @@ export default function BrowseProjectsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
-      {/* Header */}
-      <header className="border-b border-border/50 backdrop-blur-sm bg-background/80 sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">ME</span>
-            </div>
-            <span className="text-xl font-bold text-foreground">Moca Edge</span>
-          </Link>
-          <div className="flex items-center space-x-4">
-            <Button asChild variant="ghost">
-              <Link href="/create-project">Post Project</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/reputation">My Profile</Link>
-            </Button>
-            <ConnectButton />
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         {/* Page Header */}

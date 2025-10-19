@@ -12,7 +12,6 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import {
-  ArrowLeft,
   Building2,
   Target,
   Users,
@@ -31,7 +30,7 @@ import {
   Star,
   Award
 } from "lucide-react"
-import Link from "next/link"
+import { SiteHeader } from "@/components/site-header"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { useRouter } from "next/navigation"
 
@@ -289,38 +288,25 @@ export default function CreateProjectPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
-      {/* Header */}
-      <header
-        ref={headerReveal.ref}
-        className={`border-b border-border/50 backdrop-blur-sm bg-background/80 transition-all duration-1000 ease-out ${
-          headerReveal.isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
-        }`}
-      >
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </Link>
-            </Button>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">ME</span>
-              </div>
-              <span className="text-xl font-bold text-foreground">Create Testing Project</span>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" onClick={() => handleSubmit(true)} disabled={isSubmitting}>
-              <Save className="w-4 h-4 mr-2" />
-              Save Draft
-            </Button>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Page Header with Save Draft */}
+        <div
+          ref={headerReveal.ref}
+          className={`mb-6 flex items-center justify-between transition-all duration-1000 ease-out ${
+            headerReveal.isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
+          }`}
+        >
+          <div>
+            <h1 className="text-3xl font-bold">Create Testing Project</h1>
+            <p className="text-muted-foreground">Post a new project and find qualified testers</p>
+          </div>
+          <Button variant="outline" onClick={() => handleSubmit(true)} disabled={isSubmitting}>
+            <Save className="w-4 h-4 mr-2" />
+            Save Draft
+          </Button>
+        </div>
         {/* Progress Steps */}
         <div
           ref={formReveal.ref}
